@@ -36,3 +36,15 @@ actions.
   live-verified behaviour instead. Upstream drift is handled by editing definitions.
 - A repo-kit gap is surfaced upstream: the `power-platform-connectors` type has no
   hand-authored variant (GitHub issue to be filed against `pbnz/repo-kit`).
+
+## Addendum (2026-07-04): a small generator for the repetitive ops
+
+Every SDP operation shares the same shape (authtoken header, single `input_data` envelope,
+`response_status`/`list_info` handling). Hand-copying ~40 near-identical operation blocks per
+connector is error-prone, so `tools/gen_swagger.py` stamps the boilerplate from a **hand-curated
+operation table** (endpoints/verbs/examples authored from live probes + the sibling MCP
+inventory). This is explicitly **not** the forbidden Postman conversion — the input is a small
+reviewable Python spec, not the 9 MB collection, and the **generated JSON remains the committed,
+reviewed artifact**. Trade-off accepted: a build step (`python tools/gen_swagger.py`) is needed
+to regenerate, versus editing JSON directly. The Phase 0 skeleton (hand-written, 9/9 verified)
+is the pattern the generator reproduces.

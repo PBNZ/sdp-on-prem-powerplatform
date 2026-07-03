@@ -1,0 +1,23 @@
+# Phase 1 read verification — SDP demo (read-only), 2026-07-03T23:12:11Z
+# GET {module}?input_data={"list_info":{"row_count":2,"get_total_count":true}}  (authtoken header)
+
+changes                    HTTP 200  "status_code":2000
+problems                   HTTP 200  "status_code":2000
+solutions                  HTTP 200  "status_code":2000
+requests/860/notes         HTTP 200  "status_code":2000
+requests/860/worklogs      HTTP 200  "status_code":2000
+requests/860/tasks         HTTP 200  "status_code":2000
+technicians                HTTP 200  "status_code":2000
+users                      HTTP 200  "status_code":2000
+categories                 HTTP 200  "status_code":2000
+statuses                   HTTP 200  "status_code":2000
+priorities                 HTTP 200  "status_code":2000
+sites                      HTTP 200  "status_code":2000
+support_groups             HTTP 200  "status_code":2000
+departments                HTTP 200  "status_code":2000
+urgencies                  HTTP 200  "status_code":2000
+impacts                    HTTP 200  "status_code":2000
+modes                      HTTP 200  "status_code":2000
+request_types              HTTP 200  "status_code":2000
+{"response_status":{"status_code":2000,"status":"success"},"resolution":{"resolution_attachments":[],"content":null}}
+requests/860/resolutions HTTP 200

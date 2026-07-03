@@ -1,14 +1,33 @@
 # SDP – Service Desk connector
 
-Power Platform custom connector for ManageEngine ServiceDesk Plus On-Premises service desk
-requests. **Phase 0 (walking skeleton):** List Requests, Get Request, Create Request. Phase 1
-expands this to notes, worklogs, resolution, close/delete, changes, problems, solutions, tasks,
-and admin-lookup dropdowns.
+Power Platform custom connector for ManageEngine ServiceDesk Plus On-Premises. **37 operations**
+across requests (list/get/create/update/close/delete + notes, worklogs, tasks, resolution),
+changes, problems, solutions, and 12 admin-lookup dropdown sources.
 
 ## Files
 
-- `apiDefinition.swagger.json` — the OpenAPI 2.0 definition (import this).
+- `apiDefinition.swagger.json` — the OpenAPI 2.0 definition (import this). **Generated** by
+  `tools/gen_swagger.py` from a hand-curated operation table (see ADR-0001); the JSON is the
+  committed, reviewable artifact — regenerate with `python tools/gen_swagger.py` after editing
+  the spec.
 - `apiProperties.json` — connection parameter (the API key) + capabilities (cloud + gateway).
+
+## Operations
+
+| Group | Operations |
+|---|---|
+| Requests | List, Get, Create, Update, Close, Delete |
+| Request children | List/Add Notes, List/Add Worklogs, List Tasks, Get/Add Resolution |
+| Changes | List, Get, Create, Update |
+| Problems | List, Get, Create, Update |
+| Solutions | List, Get, Create, Update |
+| Admin lookups (dropdowns) | technicians, requesters (`/users`), categories, statuses, priorities, sites, support groups (`/support_groups`), departments, urgencies, impacts, modes, request types |
+
+**Build note — lookup endpoints:** this connector points *List requesters* at `/users` and
+*List support groups* at `/support_groups`, which are the paths verified live on the demo build.
+Some SDP builds instead expose `/requesters` and `/groups`. If a lookup 404s on your instance,
+edit the operation's path in the definition (or the `endpoint` in `tools/gen_swagger.py` and
+regenerate).
 
 ## Setup
 

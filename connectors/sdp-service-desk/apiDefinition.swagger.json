@@ -2,8 +2,8 @@
   "swagger": "2.0",
   "info": {
     "title": "SDP - Service Desk",
-    "description": "Work with ManageEngine ServiceDesk Plus On-Premises service desk requests: list, get, and create requests on your own internet-published SDP instance. Authenticates with a technician/integration API key sent as the 'authtoken' header. All SDP parameters travel inside a single 'input_data' JSON envelope, per the SDP V3 API contract.",
-    "version": "0.1.0",
+    "description": "Work with ManageEngine ServiceDesk Plus On-Premises requests, changes, problems, solutions, notes, worklogs, tasks, and resolutions, plus admin lookups for dropdowns. Auth: technician API key in the 'authtoken' header. Every parameter is wrapped in a single 'input_data' JSON envelope per the SDP V3 API contract.",
+    "version": "0.2.0",
     "contact": {
       "name": "Peter Braun",
       "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform"
@@ -11,8 +11,12 @@
   },
   "host": "sdp.example.com",
   "basePath": "/api/v3",
-  "schemes": ["https"],
-  "produces": ["application/json"],
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
   "securityDefinitions": {
     "api_key": {
       "type": "apiKey",
@@ -20,13 +24,17 @@
       "name": "authtoken"
     }
   },
-  "security": [{ "api_key": [] }],
+  "security": [
+    {
+      "api_key": []
+    }
+  ],
   "paths": {
     "/requests": {
       "get": {
         "operationId": "ListRequests",
         "summary": "List requests",
-        "description": "Lists service desk requests with pagination, sorting, and search criteria via the input_data envelope.",
+        "description": "Lists service desk requests with pagination, sorting, and search criteria.",
         "parameters": [
           {
             "name": "input_data",
@@ -35,49 +43,29 @@
             "required": false,
             "x-ms-summary": "Input Data (JSON)",
             "x-ms-visibility": "important",
-            "default": "{\"list_info\":{\"row_count\":10,\"start_index\":1,\"get_total_count\":true}}",
-            "description": "SDP list_info envelope as a JSON string. Example: {\"list_info\":{\"row_count\":10,\"start_index\":1,\"get_total_count\":true,\"search_criteria\":{\"field\":\"status.name\",\"condition\":\"is\",\"value\":\"Open\"}}}. row_count max 100; dates use epoch milliseconds."
+            "description": "Lists service desk requests with pagination, sorting, and search criteria. Uses the list_info envelope.",
+            "default": "{\"list_info\":{\"row_count\":10,\"start_index\":1,\"get_total_count\":true,\"search_criteria\":{\"field\":\"status.name\",\"condition\":\"is\",\"value\":\"Open\"}}}"
           },
-          { "$ref": "#/parameters/AcceptHeader" }
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Request list returned",
+            "description": "List requests returned.",
             "schema": {
-              "type": "object",
-              "properties": {
-                "response_status": {
-                  "description": "SDP status envelope (object or array depending on build); success has status_code 2000.",
-                  "x-ms-summary": "Response Status"
-                },
-                "list_info": {
-                  "type": "object",
-                  "x-ms-summary": "List Info",
-                  "description": "Pagination state for the returned page.",
-                  "properties": {
-                    "has_more_rows": { "type": "boolean", "x-ms-summary": "Has More Rows" },
-                    "start_index": { "type": "integer", "x-ms-summary": "Start Index" },
-                    "row_count": { "type": "integer", "x-ms-summary": "Row Count" },
-                    "total_count": { "type": "integer", "x-ms-summary": "Total Count" }
-                  }
-                },
-                "requests": {
-                  "type": "array",
-                  "x-ms-summary": "Requests",
-                  "description": "The requests on this page.",
-                  "items": { "$ref": "#/definitions/RequestSummary" }
-                }
-              }
+              "$ref": "#/definitions/RequestListEnvelope"
             }
           },
-          "default": { "description": "SDP error envelope (response_status.status_code != 2000)" }
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
         }
       },
       "post": {
         "operationId": "CreateRequest",
         "summary": "Create request",
-        "description": "Creates a new service desk request from a request payload inside the input_data envelope.",
-        "consumes": ["application/x-www-form-urlencoded"],
+        "description": "Creates a new service desk request. Only subject is required.",
         "parameters": [
           {
             "name": "input_data",
@@ -86,21 +74,32 @@
             "required": true,
             "x-ms-summary": "Input Data (JSON)",
             "x-ms-visibility": "important",
-            "description": "SDP request payload as a JSON string. Only subject is required. Example: {\"request\":{\"subject\":\"Printer not working\",\"description\":\"Details here\",\"requester\":{\"email_id\":\"user@company.com\"},\"priority\":{\"name\":\"High\"},\"request_type\":{\"name\":\"Incident\"}}}"
+            "description": "Creates a new service desk request. Only subject is required. Example: {\"request\":{\"subject\":\"Printer down\",\"requester\":{\"email_id\":\"user@company.com\"},\"priority\":{\"name\":\"High\"}}}"
           },
-          { "$ref": "#/parameters/AcceptHeader" }
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
         ],
         "responses": {
           "201": {
-            "description": "Request created",
-            "schema": { "$ref": "#/definitions/SingleRequestEnvelope" }
+            "description": "Create request created.",
+            "schema": {
+              "$ref": "#/definitions/RequestEnvelope"
+            }
           },
           "200": {
-            "description": "Request created (builds that return 200)",
-            "schema": { "$ref": "#/definitions/SingleRequestEnvelope" }
+            "description": "Create request created (builds returning 200).",
+            "schema": {
+              "$ref": "#/definitions/RequestEnvelope"
+            }
           },
-          "default": { "description": "SDP error envelope (response_status.status_code != 2000)" }
-        }
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        },
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ]
       }
     },
     "/requests/{request_id}": {
@@ -115,17 +114,1268 @@
             "type": "string",
             "required": true,
             "x-ms-summary": "Request ID",
-            "description": "The numeric ID of the request."
+            "description": "Request ID."
           },
-          { "$ref": "#/parameters/AcceptHeader" }
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Request details returned",
-            "schema": { "$ref": "#/definitions/SingleRequestEnvelope" }
+            "description": "Get request returned.",
+            "schema": {
+              "$ref": "#/definitions/RequestEnvelope"
+            }
           },
-          "default": { "description": "SDP error envelope (response_status.status_code != 2000)" }
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
         }
+      },
+      "put": {
+        "operationId": "UpdateRequest",
+        "summary": "Update request",
+        "description": "Updates an existing request; only provided fields change.",
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "Request ID",
+            "description": "Request ID."
+          },
+          {
+            "name": "input_data",
+            "in": "formData",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "Input Data (JSON)",
+            "x-ms-visibility": "important",
+            "description": "Updates an existing request; only provided fields change. Example: {\"request\":{\"priority\":{\"name\":\"High\"},\"status\":{\"name\":\"In Progress\"}}}"
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Update request updated.",
+            "schema": {
+              "$ref": "#/definitions/RequestEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        },
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ]
+      },
+      "delete": {
+        "operationId": "DeleteRequest",
+        "summary": "Delete request",
+        "description": "Moves a request to the trash (destructive).",
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "Request ID",
+            "description": "Request ID."
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Delete request done."
+          },
+          "204": {
+            "description": "Deleted."
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        }
+      }
+    },
+    "/requests/{request_id}/close": {
+      "put": {
+        "operationId": "CloseRequest",
+        "summary": "Close request",
+        "description": "Closes a request with optional closure details. Mandatory fields and workflow status transitions may be required first.",
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "Request ID",
+            "description": "Request ID."
+          },
+          {
+            "name": "input_data",
+            "in": "formData",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "Input Data (JSON)",
+            "x-ms-visibility": "important",
+            "description": "Closure envelope. Example: {\"request\":{\"closure_info\":{\"closure_comments\":\"Resolved\",\"closure_code\":{\"name\":\"Success\"}}}}"
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Request closed.",
+            "schema": {
+              "$ref": "#/definitions/RequestEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        },
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ]
+      }
+    },
+    "/requests/{request_id}/notes": {
+      "get": {
+        "operationId": "ListRequestNotes",
+        "summary": "List request notes",
+        "description": "Lists notes attached to a request.",
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "Request ID",
+            "description": "Request ID."
+          },
+          {
+            "name": "input_data",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "x-ms-summary": "Input Data (JSON)",
+            "x-ms-visibility": "important",
+            "description": "Optional input_data envelope as a JSON string."
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List request notes returned.",
+            "schema": {
+              "$ref": "#/definitions/NoteListEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        }
+      },
+      "post": {
+        "operationId": "AddRequestNote",
+        "summary": "Add request note",
+        "description": "Adds a note to a request.",
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "Request ID",
+            "description": "Request ID."
+          },
+          {
+            "name": "input_data",
+            "in": "formData",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "Input Data (JSON)",
+            "x-ms-visibility": "important",
+            "description": "Adds a note to a request. Example: {\"note\":{\"description\":\"Called the user\",\"show_to_requester\":false}}"
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Add request note created.",
+            "schema": {
+              "$ref": "#/definitions/NoteEnvelope"
+            }
+          },
+          "200": {
+            "description": "Add request note created (builds returning 200).",
+            "schema": {
+              "$ref": "#/definitions/NoteEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        },
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ]
+      }
+    },
+    "/requests/{request_id}/worklogs": {
+      "get": {
+        "operationId": "ListRequestWorklogs",
+        "summary": "List request worklogs",
+        "description": "Lists worklogs (time entries) for a request.",
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "Request ID",
+            "description": "Request ID."
+          },
+          {
+            "name": "input_data",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "x-ms-summary": "Input Data (JSON)",
+            "x-ms-visibility": "important",
+            "description": "Optional input_data envelope as a JSON string."
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List request worklogs returned.",
+            "schema": {
+              "$ref": "#/definitions/WorklogListEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        }
+      },
+      "post": {
+        "operationId": "AddRequestWorklog",
+        "summary": "Add request worklog",
+        "description": "Adds a worklog (time entry) to a request.",
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "Request ID",
+            "description": "Request ID."
+          },
+          {
+            "name": "input_data",
+            "in": "formData",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "Input Data (JSON)",
+            "x-ms-visibility": "important",
+            "description": "Adds a worklog (time entry) to a request. Example: {\"worklog\":{\"description\":\"1h investigation\",\"time_spent\":{\"hours\":1}}}"
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Add request worklog created.",
+            "schema": {
+              "$ref": "#/definitions/WorklogEnvelope"
+            }
+          },
+          "200": {
+            "description": "Add request worklog created (builds returning 200).",
+            "schema": {
+              "$ref": "#/definitions/WorklogEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        },
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ]
+      }
+    },
+    "/requests/{request_id}/tasks": {
+      "get": {
+        "operationId": "ListRequestTasks",
+        "summary": "List request tasks",
+        "description": "Lists tasks associated with a request.",
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "Request ID",
+            "description": "Request ID."
+          },
+          {
+            "name": "input_data",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "x-ms-summary": "Input Data (JSON)",
+            "x-ms-visibility": "important",
+            "description": "Optional input_data envelope as a JSON string."
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List request tasks returned.",
+            "schema": {
+              "$ref": "#/definitions/TaskListEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        }
+      }
+    },
+    "/requests/{request_id}/resolutions": {
+      "get": {
+        "operationId": "GetRequestResolution",
+        "summary": "Get request resolution",
+        "description": "Gets the resolution of a request.",
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "Request ID",
+            "description": "Request ID."
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get request resolution returned.",
+            "schema": {
+              "$ref": "#/definitions/ResolutionEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        }
+      },
+      "post": {
+        "operationId": "AddRequestResolution",
+        "summary": "Add request resolution",
+        "description": "Adds/sets the resolution of a request.",
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "Request ID",
+            "description": "Request ID."
+          },
+          {
+            "name": "input_data",
+            "in": "formData",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "Input Data (JSON)",
+            "x-ms-visibility": "important",
+            "description": "Adds/sets the resolution of a request. Example: {\"resolution\":{\"content\":\"Replaced the toner cartridge.\"}}"
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Add request resolution created.",
+            "schema": {
+              "$ref": "#/definitions/ResolutionEnvelope"
+            }
+          },
+          "200": {
+            "description": "Add request resolution created (builds returning 200).",
+            "schema": {
+              "$ref": "#/definitions/ResolutionEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        },
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ]
+      }
+    },
+    "/changes": {
+      "get": {
+        "operationId": "ListChanges",
+        "summary": "List changes",
+        "description": "Lists change requests with pagination and search criteria.",
+        "parameters": [
+          {
+            "name": "input_data",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "x-ms-summary": "Input Data (JSON)",
+            "x-ms-visibility": "important",
+            "description": "Lists change requests with pagination and search criteria. Uses the list_info envelope.",
+            "default": "{\"list_info\":{\"row_count\":10,\"start_index\":1,\"get_total_count\":true}}"
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List changes returned.",
+            "schema": {
+              "$ref": "#/definitions/ChangeListEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        }
+      },
+      "post": {
+        "operationId": "CreateChange",
+        "summary": "Create change",
+        "description": "Creates a new change. title is required.",
+        "parameters": [
+          {
+            "name": "input_data",
+            "in": "formData",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "Input Data (JSON)",
+            "x-ms-visibility": "important",
+            "description": "Creates a new change. title is required. Example: {\"change\":{\"title\":\"Upgrade DB server\",\"change_type\":{\"name\":\"Normal\"}}}"
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Create change created.",
+            "schema": {
+              "$ref": "#/definitions/ChangeEnvelope"
+            }
+          },
+          "200": {
+            "description": "Create change created (builds returning 200).",
+            "schema": {
+              "$ref": "#/definitions/ChangeEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        },
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ]
+      }
+    },
+    "/changes/{change_id}": {
+      "get": {
+        "operationId": "GetChange",
+        "summary": "Get change",
+        "description": "Gets full details of a single change by its ID.",
+        "parameters": [
+          {
+            "name": "change_id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "Change ID",
+            "description": "Change ID."
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get change returned.",
+            "schema": {
+              "$ref": "#/definitions/ChangeEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        }
+      },
+      "put": {
+        "operationId": "UpdateChange",
+        "summary": "Update change",
+        "description": "Updates an existing change; only provided fields change.",
+        "parameters": [
+          {
+            "name": "change_id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "Change ID",
+            "description": "Change ID."
+          },
+          {
+            "name": "input_data",
+            "in": "formData",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "Input Data (JSON)",
+            "x-ms-visibility": "important",
+            "description": "Updates an existing change; only provided fields change. Example: {\"change\":{\"stage\":{\"name\":\"Implementation\"}}}"
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Update change updated.",
+            "schema": {
+              "$ref": "#/definitions/ChangeEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        },
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ]
+      }
+    },
+    "/problems": {
+      "get": {
+        "operationId": "ListProblems",
+        "summary": "List problems",
+        "description": "Lists problems with pagination and search criteria.",
+        "parameters": [
+          {
+            "name": "input_data",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "x-ms-summary": "Input Data (JSON)",
+            "x-ms-visibility": "important",
+            "description": "Lists problems with pagination and search criteria. Uses the list_info envelope.",
+            "default": "{\"list_info\":{\"row_count\":10,\"start_index\":1,\"get_total_count\":true}}"
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List problems returned.",
+            "schema": {
+              "$ref": "#/definitions/ProblemListEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        }
+      },
+      "post": {
+        "operationId": "CreateProblem",
+        "summary": "Create problem",
+        "description": "Creates a new problem. title is required.",
+        "parameters": [
+          {
+            "name": "input_data",
+            "in": "formData",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "Input Data (JSON)",
+            "x-ms-visibility": "important",
+            "description": "Creates a new problem. title is required. Example: {\"problem\":{\"title\":\"Recurring VPN drops\"}}"
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Create problem created.",
+            "schema": {
+              "$ref": "#/definitions/ProblemEnvelope"
+            }
+          },
+          "200": {
+            "description": "Create problem created (builds returning 200).",
+            "schema": {
+              "$ref": "#/definitions/ProblemEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        },
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ]
+      }
+    },
+    "/problems/{problem_id}": {
+      "get": {
+        "operationId": "GetProblem",
+        "summary": "Get problem",
+        "description": "Gets full details of a single problem by its ID.",
+        "parameters": [
+          {
+            "name": "problem_id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "Problem ID",
+            "description": "Problem ID."
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get problem returned.",
+            "schema": {
+              "$ref": "#/definitions/ProblemEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        }
+      },
+      "put": {
+        "operationId": "UpdateProblem",
+        "summary": "Update problem",
+        "description": "Updates an existing problem; only provided fields change.",
+        "parameters": [
+          {
+            "name": "problem_id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "Problem ID",
+            "description": "Problem ID."
+          },
+          {
+            "name": "input_data",
+            "in": "formData",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "Input Data (JSON)",
+            "x-ms-visibility": "important",
+            "description": "Updates an existing problem; only provided fields change. Example: {\"problem\":{\"status\":{\"name\":\"Closed\"}}}"
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Update problem updated.",
+            "schema": {
+              "$ref": "#/definitions/ProblemEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        },
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ]
+      }
+    },
+    "/solutions": {
+      "get": {
+        "operationId": "ListSolutions",
+        "summary": "List solutions",
+        "description": "Lists knowledge base / solution articles.",
+        "parameters": [
+          {
+            "name": "input_data",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "x-ms-summary": "Input Data (JSON)",
+            "x-ms-visibility": "important",
+            "description": "Lists knowledge base / solution articles. Uses the list_info envelope.",
+            "default": "{\"list_info\":{\"row_count\":10,\"start_index\":1,\"get_total_count\":true}}"
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List solutions returned.",
+            "schema": {
+              "$ref": "#/definitions/SolutionListEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        }
+      },
+      "post": {
+        "operationId": "CreateSolution",
+        "summary": "Create solution",
+        "description": "Creates a new solution article. title is required.",
+        "parameters": [
+          {
+            "name": "input_data",
+            "in": "formData",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "Input Data (JSON)",
+            "x-ms-visibility": "important",
+            "description": "Creates a new solution article. title is required. Example: {\"solution\":{\"title\":\"How to reset VPN\",\"description\":\"Steps...\",\"topic\":{\"name\":\"Network\"}}}"
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Create solution created.",
+            "schema": {
+              "$ref": "#/definitions/SolutionEnvelope"
+            }
+          },
+          "200": {
+            "description": "Create solution created (builds returning 200).",
+            "schema": {
+              "$ref": "#/definitions/SolutionEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        },
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ]
+      }
+    },
+    "/solutions/{solution_id}": {
+      "get": {
+        "operationId": "GetSolution",
+        "summary": "Get solution",
+        "description": "Gets a single solution article by its ID.",
+        "parameters": [
+          {
+            "name": "solution_id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "Solution ID",
+            "description": "Solution ID."
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get solution returned.",
+            "schema": {
+              "$ref": "#/definitions/SolutionEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        }
+      },
+      "put": {
+        "operationId": "UpdateSolution",
+        "summary": "Update solution",
+        "description": "Updates an existing solution article; only provided fields change.",
+        "parameters": [
+          {
+            "name": "solution_id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "Solution ID",
+            "description": "Solution ID."
+          },
+          {
+            "name": "input_data",
+            "in": "formData",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "Input Data (JSON)",
+            "x-ms-visibility": "important",
+            "description": "Updates an existing solution article; only provided fields change. Example: {\"solution\":{\"is_public\":true}}"
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Update solution updated.",
+            "schema": {
+              "$ref": "#/definitions/SolutionEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        },
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ]
+      }
+    },
+    "/technicians": {
+      "get": {
+        "operationId": "ListTechnicians",
+        "summary": "List technicians",
+        "description": "Lists technicians. Intended as a dropdown source.",
+        "parameters": [
+          {
+            "name": "input_data",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "x-ms-summary": "Input Data (JSON)",
+            "x-ms-visibility": "important",
+            "description": "Lists technicians. Intended as a dropdown source. Uses the list_info envelope.",
+            "default": "{\"list_info\":{\"row_count\":100,\"start_index\":1,\"get_total_count\":true}}"
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List technicians returned.",
+            "schema": {
+              "$ref": "#/definitions/LookupListEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        },
+        "x-ms-visibility": "advanced"
+      }
+    },
+    "/users": {
+      "get": {
+        "operationId": "ListRequesters",
+        "summary": "List requesters",
+        "description": "Lists requesters / end users (the /users module; some builds use /requesters). Intended as a dropdown source.",
+        "parameters": [
+          {
+            "name": "input_data",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "x-ms-summary": "Input Data (JSON)",
+            "x-ms-visibility": "important",
+            "description": "Lists requesters / end users (the /users module; some builds use /requesters). Intended as a dropdown source. Uses the list_info envelope.",
+            "default": "{\"list_info\":{\"row_count\":100,\"start_index\":1,\"get_total_count\":true}}"
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List requesters returned.",
+            "schema": {
+              "$ref": "#/definitions/LookupListEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        },
+        "x-ms-visibility": "advanced"
+      }
+    },
+    "/categories": {
+      "get": {
+        "operationId": "ListCategories",
+        "summary": "List categories",
+        "description": "Lists request categories. Intended as a dropdown source.",
+        "parameters": [
+          {
+            "name": "input_data",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "x-ms-summary": "Input Data (JSON)",
+            "x-ms-visibility": "important",
+            "description": "Lists request categories. Intended as a dropdown source. Uses the list_info envelope.",
+            "default": "{\"list_info\":{\"row_count\":100,\"start_index\":1,\"get_total_count\":true}}"
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List categories returned.",
+            "schema": {
+              "$ref": "#/definitions/LookupListEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        },
+        "x-ms-visibility": "advanced"
+      }
+    },
+    "/statuses": {
+      "get": {
+        "operationId": "ListStatuses",
+        "summary": "List statuses",
+        "description": "Lists request statuses. Intended as a dropdown source.",
+        "parameters": [
+          {
+            "name": "input_data",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "x-ms-summary": "Input Data (JSON)",
+            "x-ms-visibility": "important",
+            "description": "Lists request statuses. Intended as a dropdown source. Uses the list_info envelope.",
+            "default": "{\"list_info\":{\"row_count\":100,\"start_index\":1,\"get_total_count\":true}}"
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List statuses returned.",
+            "schema": {
+              "$ref": "#/definitions/LookupListEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        },
+        "x-ms-visibility": "advanced"
+      }
+    },
+    "/priorities": {
+      "get": {
+        "operationId": "ListPriorities",
+        "summary": "List priorities",
+        "description": "Lists priority levels. Intended as a dropdown source.",
+        "parameters": [
+          {
+            "name": "input_data",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "x-ms-summary": "Input Data (JSON)",
+            "x-ms-visibility": "important",
+            "description": "Lists priority levels. Intended as a dropdown source. Uses the list_info envelope.",
+            "default": "{\"list_info\":{\"row_count\":100,\"start_index\":1,\"get_total_count\":true}}"
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List priorities returned.",
+            "schema": {
+              "$ref": "#/definitions/LookupListEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        },
+        "x-ms-visibility": "advanced"
+      }
+    },
+    "/sites": {
+      "get": {
+        "operationId": "ListSites",
+        "summary": "List sites",
+        "description": "Lists sites (locations). Intended as a dropdown source.",
+        "parameters": [
+          {
+            "name": "input_data",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "x-ms-summary": "Input Data (JSON)",
+            "x-ms-visibility": "important",
+            "description": "Lists sites (locations). Intended as a dropdown source. Uses the list_info envelope.",
+            "default": "{\"list_info\":{\"row_count\":100,\"start_index\":1,\"get_total_count\":true}}"
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List sites returned.",
+            "schema": {
+              "$ref": "#/definitions/LookupListEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        },
+        "x-ms-visibility": "advanced"
+      }
+    },
+    "/support_groups": {
+      "get": {
+        "operationId": "ListSupportGroups",
+        "summary": "List support groups",
+        "description": "Lists technician/support groups (the /support_groups module; some builds use /groups). Intended as a dropdown source.",
+        "parameters": [
+          {
+            "name": "input_data",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "x-ms-summary": "Input Data (JSON)",
+            "x-ms-visibility": "important",
+            "description": "Lists technician/support groups (the /support_groups module; some builds use /groups). Intended as a dropdown source. Uses the list_info envelope.",
+            "default": "{\"list_info\":{\"row_count\":100,\"start_index\":1,\"get_total_count\":true}}"
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List support groups returned.",
+            "schema": {
+              "$ref": "#/definitions/LookupListEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        },
+        "x-ms-visibility": "advanced"
+      }
+    },
+    "/departments": {
+      "get": {
+        "operationId": "ListDepartments",
+        "summary": "List departments",
+        "description": "Lists departments. Intended as a dropdown source.",
+        "parameters": [
+          {
+            "name": "input_data",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "x-ms-summary": "Input Data (JSON)",
+            "x-ms-visibility": "important",
+            "description": "Lists departments. Intended as a dropdown source. Uses the list_info envelope.",
+            "default": "{\"list_info\":{\"row_count\":100,\"start_index\":1,\"get_total_count\":true}}"
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List departments returned.",
+            "schema": {
+              "$ref": "#/definitions/LookupListEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        },
+        "x-ms-visibility": "advanced"
+      }
+    },
+    "/urgencies": {
+      "get": {
+        "operationId": "ListUrgencies",
+        "summary": "List urgencies",
+        "description": "Lists urgency levels. Intended as a dropdown source.",
+        "parameters": [
+          {
+            "name": "input_data",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "x-ms-summary": "Input Data (JSON)",
+            "x-ms-visibility": "important",
+            "description": "Lists urgency levels. Intended as a dropdown source. Uses the list_info envelope.",
+            "default": "{\"list_info\":{\"row_count\":100,\"start_index\":1,\"get_total_count\":true}}"
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List urgencies returned.",
+            "schema": {
+              "$ref": "#/definitions/LookupListEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        },
+        "x-ms-visibility": "advanced"
+      }
+    },
+    "/impacts": {
+      "get": {
+        "operationId": "ListImpacts",
+        "summary": "List impacts",
+        "description": "Lists impact levels. Intended as a dropdown source.",
+        "parameters": [
+          {
+            "name": "input_data",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "x-ms-summary": "Input Data (JSON)",
+            "x-ms-visibility": "important",
+            "description": "Lists impact levels. Intended as a dropdown source. Uses the list_info envelope.",
+            "default": "{\"list_info\":{\"row_count\":100,\"start_index\":1,\"get_total_count\":true}}"
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List impacts returned.",
+            "schema": {
+              "$ref": "#/definitions/LookupListEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        },
+        "x-ms-visibility": "advanced"
+      }
+    },
+    "/modes": {
+      "get": {
+        "operationId": "ListModes",
+        "summary": "List modes",
+        "description": "Lists request submission modes. Intended as a dropdown source.",
+        "parameters": [
+          {
+            "name": "input_data",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "x-ms-summary": "Input Data (JSON)",
+            "x-ms-visibility": "important",
+            "description": "Lists request submission modes. Intended as a dropdown source. Uses the list_info envelope.",
+            "default": "{\"list_info\":{\"row_count\":100,\"start_index\":1,\"get_total_count\":true}}"
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List modes returned.",
+            "schema": {
+              "$ref": "#/definitions/LookupListEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        },
+        "x-ms-visibility": "advanced"
+      }
+    },
+    "/request_types": {
+      "get": {
+        "operationId": "ListRequestTypes",
+        "summary": "List request types",
+        "description": "Lists request types (e.g. Incident, Service Request). Intended as a dropdown source.",
+        "parameters": [
+          {
+            "name": "input_data",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "x-ms-summary": "Input Data (JSON)",
+            "x-ms-visibility": "important",
+            "description": "Lists request types (e.g. Incident, Service Request). Intended as a dropdown source. Uses the list_info envelope.",
+            "default": "{\"list_info\":{\"row_count\":100,\"start_index\":1,\"get_total_count\":true}}"
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List request types returned.",
+            "schema": {
+              "$ref": "#/definitions/LookupListEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        },
+        "x-ms-visibility": "advanced"
       }
     }
   },
@@ -145,66 +1395,529 @@
     "SdpName": {
       "type": "object",
       "properties": {
-        "id": { "type": "string", "x-ms-summary": "ID" },
-        "name": { "type": "string", "x-ms-summary": "Name" }
+        "id": {
+          "type": "string",
+          "x-ms-summary": "ID"
+        },
+        "name": {
+          "type": "string",
+          "x-ms-summary": "Name"
+        }
       }
     },
     "SdpUser": {
       "type": "object",
       "properties": {
-        "id": { "type": "string", "x-ms-summary": "ID" },
-        "name": { "type": "string", "x-ms-summary": "Name" },
-        "email_id": { "type": "string", "x-ms-summary": "Email" }
+        "id": {
+          "type": "string",
+          "x-ms-summary": "ID"
+        },
+        "name": {
+          "type": "string",
+          "x-ms-summary": "Name"
+        },
+        "email_id": {
+          "type": "string",
+          "x-ms-summary": "Email"
+        }
       }
     },
     "SdpTime": {
       "type": "object",
       "properties": {
-        "display_value": { "type": "string", "x-ms-summary": "Display Value" },
-        "value": { "type": "string", "x-ms-summary": "Value (epoch ms)" }
+        "display_value": {
+          "type": "string",
+          "x-ms-summary": "Display Value"
+        },
+        "value": {
+          "type": "string",
+          "x-ms-summary": "Value (epoch ms)"
+        }
+      }
+    },
+    "ResponseStatus": {
+      "description": "SDP status envelope (object or array by build); success has status_code 2000.",
+      "x-ms-summary": "Response Status"
+    },
+    "ListInfo": {
+      "type": "object",
+      "x-ms-summary": "List Info",
+      "properties": {
+        "has_more_rows": {
+          "type": "boolean",
+          "x-ms-summary": "Has More Rows"
+        },
+        "start_index": {
+          "type": "integer",
+          "x-ms-summary": "Start Index"
+        },
+        "row_count": {
+          "type": "integer",
+          "x-ms-summary": "Row Count"
+        },
+        "total_count": {
+          "type": "integer",
+          "x-ms-summary": "Total Count"
+        }
       }
     },
     "RequestSummary": {
       "type": "object",
       "properties": {
-        "id": { "type": "string", "x-ms-summary": "Request ID" },
-        "subject": { "type": "string", "x-ms-summary": "Subject" },
-        "status": { "$ref": "#/definitions/SdpName" },
-        "priority": { "$ref": "#/definitions/SdpName" },
-        "created_time": { "$ref": "#/definitions/SdpTime" },
-        "requester": { "$ref": "#/definitions/SdpUser" },
-        "technician": { "$ref": "#/definitions/SdpUser" },
-        "group": { "$ref": "#/definitions/SdpName" },
-        "site": { "$ref": "#/definitions/SdpName" },
-        "due_by_time": { "$ref": "#/definitions/SdpTime" },
-        "is_overdue": { "type": "boolean", "x-ms-summary": "Is Overdue" }
+        "id": {
+          "type": "string",
+          "x-ms-summary": "Request ID"
+        },
+        "subject": {
+          "type": "string",
+          "x-ms-summary": "Subject"
+        },
+        "status": {
+          "$ref": "#/definitions/SdpName"
+        },
+        "priority": {
+          "$ref": "#/definitions/SdpName"
+        },
+        "created_time": {
+          "$ref": "#/definitions/SdpTime"
+        },
+        "requester": {
+          "$ref": "#/definitions/SdpUser"
+        },
+        "technician": {
+          "$ref": "#/definitions/SdpUser"
+        },
+        "group": {
+          "$ref": "#/definitions/SdpName"
+        },
+        "site": {
+          "$ref": "#/definitions/SdpName"
+        },
+        "due_by_time": {
+          "$ref": "#/definitions/SdpTime"
+        },
+        "is_overdue": {
+          "type": "boolean",
+          "x-ms-summary": "Is Overdue"
+        }
       }
     },
     "RequestDetail": {
       "type": "object",
       "properties": {
-        "id": { "type": "string", "x-ms-summary": "Request ID" },
-        "subject": { "type": "string", "x-ms-summary": "Subject" },
-        "description": { "type": "string", "x-ms-summary": "Description" },
-        "status": { "$ref": "#/definitions/SdpName" },
-        "priority": { "$ref": "#/definitions/SdpName" },
-        "request_type": { "$ref": "#/definitions/SdpName" },
-        "created_time": { "$ref": "#/definitions/SdpTime" },
-        "due_by_time": { "$ref": "#/definitions/SdpTime" },
-        "requester": { "$ref": "#/definitions/SdpUser" },
-        "technician": { "$ref": "#/definitions/SdpUser" },
-        "group": { "$ref": "#/definitions/SdpName" },
-        "site": { "$ref": "#/definitions/SdpName" }
+        "id": {
+          "type": "string",
+          "x-ms-summary": "Request ID"
+        },
+        "subject": {
+          "type": "string",
+          "x-ms-summary": "Subject"
+        },
+        "description": {
+          "type": "string",
+          "x-ms-summary": "Description"
+        },
+        "status": {
+          "$ref": "#/definitions/SdpName"
+        },
+        "priority": {
+          "$ref": "#/definitions/SdpName"
+        },
+        "request_type": {
+          "$ref": "#/definitions/SdpName"
+        },
+        "created_time": {
+          "$ref": "#/definitions/SdpTime"
+        },
+        "due_by_time": {
+          "$ref": "#/definitions/SdpTime"
+        },
+        "requester": {
+          "$ref": "#/definitions/SdpUser"
+        },
+        "technician": {
+          "$ref": "#/definitions/SdpUser"
+        },
+        "group": {
+          "$ref": "#/definitions/SdpName"
+        },
+        "site": {
+          "$ref": "#/definitions/SdpName"
+        }
       }
     },
-    "SingleRequestEnvelope": {
+    "ChangeSummary": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "x-ms-summary": "Change ID"
+        },
+        "title": {
+          "type": "string",
+          "x-ms-summary": "Title"
+        },
+        "status": {
+          "$ref": "#/definitions/SdpName"
+        },
+        "priority": {
+          "$ref": "#/definitions/SdpName"
+        },
+        "change_type": {
+          "$ref": "#/definitions/SdpName"
+        },
+        "stage": {
+          "$ref": "#/definitions/SdpName"
+        },
+        "created_time": {
+          "$ref": "#/definitions/SdpTime"
+        },
+        "change_owner": {
+          "$ref": "#/definitions/SdpUser"
+        },
+        "group": {
+          "$ref": "#/definitions/SdpName"
+        },
+        "site": {
+          "$ref": "#/definitions/SdpName"
+        }
+      }
+    },
+    "ProblemSummary": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "x-ms-summary": "Problem ID"
+        },
+        "title": {
+          "type": "string",
+          "x-ms-summary": "Title"
+        },
+        "status": {
+          "$ref": "#/definitions/SdpName"
+        },
+        "priority": {
+          "$ref": "#/definitions/SdpName"
+        },
+        "created_time": {
+          "$ref": "#/definitions/SdpTime"
+        },
+        "technician": {
+          "$ref": "#/definitions/SdpUser"
+        }
+      }
+    },
+    "SolutionSummary": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "x-ms-summary": "Solution ID"
+        },
+        "title": {
+          "type": "string",
+          "x-ms-summary": "Title"
+        },
+        "topic": {
+          "$ref": "#/definitions/SdpName"
+        },
+        "created_time": {
+          "$ref": "#/definitions/SdpTime"
+        }
+      }
+    },
+    "NoteItem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "x-ms-summary": "Note ID"
+        },
+        "description": {
+          "type": "string",
+          "x-ms-summary": "Note"
+        },
+        "created_time": {
+          "$ref": "#/definitions/SdpTime"
+        },
+        "show_to_requester": {
+          "type": "boolean",
+          "x-ms-summary": "Show To Requester"
+        }
+      }
+    },
+    "WorklogItem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "x-ms-summary": "Worklog ID"
+        },
+        "description": {
+          "type": "string",
+          "x-ms-summary": "Description"
+        },
+        "owner": {
+          "$ref": "#/definitions/SdpUser"
+        }
+      }
+    },
+    "TaskItem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "x-ms-summary": "Task ID"
+        },
+        "title": {
+          "type": "string",
+          "x-ms-summary": "Title"
+        },
+        "status": {
+          "$ref": "#/definitions/SdpName"
+        }
+      }
+    },
+    "LookupItem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "x-ms-summary": "ID"
+        },
+        "name": {
+          "type": "string",
+          "x-ms-summary": "Name"
+        }
+      }
+    },
+    "RequestListEnvelope": {
       "type": "object",
       "properties": {
         "response_status": {
-          "description": "SDP status envelope (object or array depending on build); success has status_code 2000.",
-          "x-ms-summary": "Response Status"
+          "$ref": "#/definitions/ResponseStatus"
         },
-        "request": { "$ref": "#/definitions/RequestDetail" }
+        "list_info": {
+          "$ref": "#/definitions/ListInfo"
+        },
+        "requests": {
+          "type": "array",
+          "x-ms-summary": "Requests",
+          "items": {
+            "$ref": "#/definitions/RequestSummary"
+          }
+        }
+      }
+    },
+    "RequestEnvelope": {
+      "type": "object",
+      "properties": {
+        "response_status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "request": {
+          "$ref": "#/definitions/RequestDetail"
+        }
+      }
+    },
+    "ChangeListEnvelope": {
+      "type": "object",
+      "properties": {
+        "response_status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "list_info": {
+          "$ref": "#/definitions/ListInfo"
+        },
+        "changes": {
+          "type": "array",
+          "x-ms-summary": "Changes",
+          "items": {
+            "$ref": "#/definitions/ChangeSummary"
+          }
+        }
+      }
+    },
+    "ChangeEnvelope": {
+      "type": "object",
+      "properties": {
+        "response_status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "change": {
+          "$ref": "#/definitions/ChangeSummary"
+        }
+      }
+    },
+    "ProblemListEnvelope": {
+      "type": "object",
+      "properties": {
+        "response_status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "list_info": {
+          "$ref": "#/definitions/ListInfo"
+        },
+        "problems": {
+          "type": "array",
+          "x-ms-summary": "Problems",
+          "items": {
+            "$ref": "#/definitions/ProblemSummary"
+          }
+        }
+      }
+    },
+    "ProblemEnvelope": {
+      "type": "object",
+      "properties": {
+        "response_status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "problem": {
+          "$ref": "#/definitions/ProblemSummary"
+        }
+      }
+    },
+    "SolutionListEnvelope": {
+      "type": "object",
+      "properties": {
+        "response_status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "list_info": {
+          "$ref": "#/definitions/ListInfo"
+        },
+        "solutions": {
+          "type": "array",
+          "x-ms-summary": "Solutions",
+          "items": {
+            "$ref": "#/definitions/SolutionSummary"
+          }
+        }
+      }
+    },
+    "SolutionEnvelope": {
+      "type": "object",
+      "properties": {
+        "response_status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "solution": {
+          "$ref": "#/definitions/SolutionSummary"
+        }
+      }
+    },
+    "NoteListEnvelope": {
+      "type": "object",
+      "properties": {
+        "response_status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "list_info": {
+          "$ref": "#/definitions/ListInfo"
+        },
+        "notes": {
+          "type": "array",
+          "x-ms-summary": "Notes",
+          "items": {
+            "$ref": "#/definitions/NoteItem"
+          }
+        }
+      }
+    },
+    "NoteEnvelope": {
+      "type": "object",
+      "properties": {
+        "response_status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "note": {
+          "$ref": "#/definitions/NoteItem"
+        }
+      }
+    },
+    "WorklogListEnvelope": {
+      "type": "object",
+      "properties": {
+        "response_status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "list_info": {
+          "$ref": "#/definitions/ListInfo"
+        },
+        "worklogs": {
+          "type": "array",
+          "x-ms-summary": "Worklogs",
+          "items": {
+            "$ref": "#/definitions/WorklogItem"
+          }
+        }
+      }
+    },
+    "WorklogEnvelope": {
+      "type": "object",
+      "properties": {
+        "response_status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "worklog": {
+          "$ref": "#/definitions/WorklogItem"
+        }
+      }
+    },
+    "TaskListEnvelope": {
+      "type": "object",
+      "properties": {
+        "response_status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "list_info": {
+          "$ref": "#/definitions/ListInfo"
+        },
+        "tasks": {
+          "type": "array",
+          "x-ms-summary": "Tasks",
+          "items": {
+            "$ref": "#/definitions/TaskItem"
+          }
+        }
+      }
+    },
+    "ResolutionEnvelope": {
+      "type": "object",
+      "properties": {
+        "response_status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "resolution": {
+          "type": "object",
+          "x-ms-summary": "Resolution",
+          "properties": {
+            "content": {
+              "type": "string",
+              "x-ms-summary": "Content"
+            }
+          }
+        }
+      }
+    },
+    "LookupListEnvelope": {
+      "type": "object",
+      "properties": {
+        "response_status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "list_info": {
+          "$ref": "#/definitions/ListInfo"
+        },
+        "list": {
+          "type": "array",
+          "x-ms-summary": "Items",
+          "items": {
+            "$ref": "#/definitions/LookupItem"
+          }
+        }
       }
     }
   }
