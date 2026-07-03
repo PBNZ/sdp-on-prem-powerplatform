@@ -1,0 +1,109 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "SDP - Query",
+    "description": "Read-only power tool for ManageEngine ServiceDesk Plus On-Premises: run one SQL SELECT via the Execute Query report API to replace many REST GETs (JOINs, custom fields, aggregates). Auth: technician API key in the 'authtoken' header; the SELECT is wrapped in a single 'input_data' JSON envelope. Admin-scoped ('Create Query Report' permission) and build/edition-gated — probe with 'SELECT 1 AS test' at setup and fall back to REST if it errors. Physical schema names vary by build; keep SQL in the templates/ library.",
+    "version": "0.2.0",
+    "contact": {
+      "name": "Peter Braun",
+      "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform"
+    }
+  },
+  "host": "sdp.example.com",
+  "basePath": "/api/v3",
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "securityDefinitions": {
+    "api_key": {
+      "type": "apiKey",
+      "in": "header",
+      "name": "authtoken"
+    }
+  },
+  "security": [
+    {
+      "api_key": []
+    }
+  ],
+  "paths": {
+    "/reports/_execute_query": {
+      "post": {
+        "operationId": "ExecuteQuery",
+        "summary": "Execute query",
+        "description": "Runs a single read-only SQL SELECT against the SDP database and returns rows keyed by the column aliases. POST-only; SELECT-only (UPDATE/DELETE/INSERT and information_schema/catalog queries are rejected server-side). Physical table/column names are build-specific — see the templates/ library (build 14990).",
+        "parameters": [
+          {
+            "name": "input_data",
+            "in": "formData",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "Input Data (JSON)",
+            "x-ms-visibility": "important",
+            "description": "SQL SELECT as a JSON string. Read-only (SELECT only; DML and information_schema are rejected). Always alias columns with AS. Example: {\"query\":\"SELECT workorderid AS id, title AS title FROM workorder LIMIT 5\"}"
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Query result rows.",
+            "schema": {
+              "$ref": "#/definitions/ExecuteQueryEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        },
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ]
+      }
+    }
+  },
+  "parameters": {
+    "AcceptHeader": {
+      "name": "Accept",
+      "in": "header",
+      "type": "string",
+      "required": false,
+      "default": "application/vnd.manageengine.sdp.v3+json",
+      "x-ms-summary": "Accept",
+      "x-ms-visibility": "internal",
+      "description": "SDP V3 media type; leave the default."
+    }
+  },
+  "definitions": {
+    "ResponseStatus": {
+      "description": "SDP status envelope (object or array by build); success has status_code 2000.",
+      "x-ms-summary": "Response Status"
+    },
+    "ExecuteQueryEnvelope": {
+      "type": "object",
+      "properties": {
+        "response_status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "execute_query": {
+          "type": "object",
+          "x-ms-summary": "Execute Query",
+          "properties": {
+            "data": {
+              "type": "array",
+              "x-ms-summary": "Rows",
+              "description": "Result rows, keyed by the SQL column aliases (always use AS).",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -14,16 +14,22 @@
   (fixed the one flagged item: unverified worklog example field).
 - **Phase 2 — CMDB connectors:**
   - `sdp-assets-cmdb-v3` (**13 ops**): ci_types, /cmdb, per-type CIs (create/get/update),
-    _metadata, assoc_ci_relationships, asset_modules, assets. Generated; valid Swagger 2.0,
-    24 KB. All read ops + relationships 2xx live on demo (build 15100+).
+    _metadata, assoc_ci_relationships, asset_modules, assets. Generated; valid Swagger 2.0.
+    All read ops + relationships 2xx live on demo (build 15100+). Verifier PASS.
   - `sdp-cmdb-v1` (**4 ops**): hand-authored legacy XML API, `TECHNICIAN_KEY` query auth.
-    List/Count CIs 2xx live; relationship ops modeled from the working V1 client (demo is
-    15100+ so V1 relationships are superseded there).
+    List/Count CIs 2xx live; relationship ops modeled from the working V1 client. Verifier PASS.
   - Evidence: `docs/test-evidence/phase2-reads.txt`.
+- **Phase 3 — Query connector:**
+  - `sdp-query` (**1 op**): `ExecuteQuery` (POST /reports/_execute_query). Generated; valid.
+  - Live-verified: SELECT returns rows; `SELECT 1` probe works; UPDATE, information_schema, and
+    GET are all rejected. Evidence: `docs/test-evidence/phase3-execute-query.txt`.
+  - `templates/` — 8 SQL templates (build 14990), **each verified to run live** (2000).
+- **Top-level README** written (install, host, key + scoping, gateway choice, build caveats,
+  Execute-Query usage + schema-fragility warning) — acceptance criterion #6.
 
 ## In progress
 
-- Phase 2 gate: fresh-context verifier subagent on both CMDB connectors (running).
+- Final acceptance sweep: full-repo fresh-context verifier + placeholder/host consistency check.
 
 ## Known gap (see LESSONS.md)
 
@@ -36,19 +42,20 @@
 
 ## Exact next step
 
-Phase 3 — build the `sdp-query` connector: one `ExecuteQuery` action
-(`POST /api/v3/reports/_execute_query`, `input_data={"query":"SELECT ..."}`), a capability-probe
-note (`SELECT 1`), and a `templates/` SQL library keyed to the build-14990 schema
-(requests via `workorder`, CIs via `ci`, assets via `resources`, relationships). Verify
-`ExecuteQuery` returns rows on the demo and that a write/DML attempt is rejected. Then top-level
-README + final acceptance sweep.
+v1 build complete (Phases 0–3). Remaining before publish (needs Peter / a tenant):
+1. Live **write** verification (create/update/close/delete, CI writes, relationship writes) on a
+   disposable instance once a valid technician key exists — run
+   `tools/live-test.ps1 -HostName <host> -ApiKey <key> -IncludeCreate -SkipCertCheck`.
+2. Optional: import one connector into a real Power Platform tenant and run one action end-to-end.
+3. Optional enhancements: friendly typed params for top actions; dynamic-host policy; Microsoft
+   certification.
 
 ## Phase map (PRD §6)
 
 - [x] Phase 0 — walking skeleton (3 request ops; reads proven live, create authored + pending key)
 - [x] Phase 1 — full Service Desk connector + admin lookups (37 ops, reads live, verified 9/9)
-- [x] Phase 2 — Assets & CMDB v3 (13 ops) + CMDB v1 legacy (4 ops)
-- [ ] Phase 3 — Query connector (ExecuteQuery + template library)
+- [x] Phase 2 — Assets & CMDB v3 (13 ops) + CMDB v1 legacy (4 ops), both verifier PASS
+- [x] Phase 3 — Query connector (1 op) + 8 live-verified SQL templates
 
 ## Cross-phase open item
 

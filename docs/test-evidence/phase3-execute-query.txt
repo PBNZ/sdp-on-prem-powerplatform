@@ -1,0 +1,11 @@
+# Phase 3 Execute Query verification — SDP demo (read-only), 2026-07-03T23:23:26Z
+# POST /api/v3/reports/_execute_query, input_data={"query":"..."}, authtoken header
+
+00-capability-probe.sql          OK status_code=2000 rows=1
+01-recent-requests.sql           OK status_code=2000 rows=20
+02-request-count-by-status.sql   OK status_code=2000 rows=6
+03-overdue-requests.sql          OK status_code=2000 rows=50
+04-ci-list.sql                   OK status_code=2000 rows=25
+05-relationship-types.sql        OK status_code=2000 rows=24
+06-assets.sql                    OK status_code=2000 rows=25
+07-request-asset-links.sql       OK status_code=2000 rows=0

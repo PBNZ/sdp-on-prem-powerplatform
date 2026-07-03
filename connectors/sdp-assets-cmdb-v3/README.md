@@ -46,6 +46,10 @@ GET (except `_metadata`, which takes none), a form field on POST/PUT. Success is
 
 ## Caveats
 
+- **CI Type is a path segment.** The `/{ci_type}` operations take the type's `api_plural_name`
+  as the first path segment. Enter a real plural name (from **List CI types**), e.g.
+  `cmdb_businessservice` — not a literal like `assets` or `cmdb` (those have their own
+  operations and would hit different semantics).
 - **Create/Update CI payloads are type-specific.** The connector models `input_data` as a raw
   JSON envelope; confirm the correct field set for each CI type via **Get CI type metadata**.
   These write ops are authored but were not live write-tested (see repo `LESSONS.md`).

@@ -1,0 +1,21 @@
+{
+  "properties": {
+    "connectionParameters": {
+      "api_key": {
+        "type": "securestring",
+        "uiDefinition": {
+          "displayName": "API Key (authtoken)",
+          "description": "The ServiceDesk Plus technician/integration API key. Sent as the 'authtoken' HTTP header. Execute Query is admin-scoped: the key's technician needs the 'Create Query Report' permission (SDAdmin). Scope it to a least-privilege reporting role.",
+          "tooltip": "Provide your ServiceDesk Plus technician API key",
+          "constraints": {
+            "tabIndex": 2,
+            "clearText": false,
+            "required": "true"
+          }
+        }
+      }
+    },
+    "iconBrandColor": "#106EBE",
+    "capabilities": ["gateway", "cloud"]
+  }
+}

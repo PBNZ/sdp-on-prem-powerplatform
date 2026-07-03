@@ -571,36 +571,6 @@
         }
       }
     },
-    "SdpUser": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "x-ms-summary": "ID"
-        },
-        "name": {
-          "type": "string",
-          "x-ms-summary": "Name"
-        },
-        "email_id": {
-          "type": "string",
-          "x-ms-summary": "Email"
-        }
-      }
-    },
-    "SdpTime": {
-      "type": "object",
-      "properties": {
-        "display_value": {
-          "type": "string",
-          "x-ms-summary": "Display Value"
-        },
-        "value": {
-          "type": "string",
-          "x-ms-summary": "Value (epoch ms)"
-        }
-      }
-    },
     "ResponseStatus": {
       "description": "SDP status envelope (object or array by build); success has status_code 2000.",
       "x-ms-summary": "Response Status"

@@ -422,8 +422,9 @@ def assets_cmdb_v3():
                   "id": {"type": "string", "x-ms-summary": "CI ID"},
                   "name": {"type": "string", "x-ms-summary": "Name"},
                   "ci_type": ref("SdpName")}}
+    # V3 CMDB CIs/assets don't use the user/time sub-objects — omit them (lean).
     defs = {
-        "SdpName": name, "SdpUser": user, "SdpTime": time,
+        "SdpName": name,
         "ResponseStatus": status, "ListInfo": list_info,
         "CIType": {"type": "object", "properties": {
             "id": {"type": "string", "x-ms-summary": "CI Type ID"},
@@ -520,9 +521,50 @@ def assets_cmdb_v3():
         "/api/v3", ops, defs)
 
 
+# ---------------------------------------------------------------------------
+# SDP – Query (Execute Query) connector
+# ---------------------------------------------------------------------------
+
+def query():
+    _, _, _, status, _ = common_defs()
+    defs = {
+        "ResponseStatus": status,
+        "ExecuteQueryEnvelope": {"type": "object", "properties": {
+            "response_status": ref("ResponseStatus"),
+            "execute_query": {"type": "object", "x-ms-summary": "Execute Query", "properties": {
+                "data": {"type": "array", "x-ms-summary": "Rows",
+                         "description": "Result rows, keyed by the SQL column aliases (always use AS).",
+                         "items": {"type": "object"}}}}}},
+    }
+    example = ('SQL SELECT as a JSON string. Read-only (SELECT only; DML and information_schema '
+               'are rejected). Always alias columns with AS. Example: '
+               '{"query":"SELECT workorderid AS id, title AS title FROM workorder LIMIT 5"}')
+    ops = [
+        ("/reports/_execute_query", "post", op(
+            "ExecuteQuery", "Execute query",
+            "Runs a single read-only SQL SELECT against the SDP database and returns rows keyed "
+            "by the column aliases. POST-only; SELECT-only (UPDATE/DELETE/INSERT and "
+            "information_schema/catalog queries are rejected server-side). Physical table/column "
+            "names are build-specific — see the templates/ library (build 14990).",
+            [input_data_form(example), accept_ref()],
+            {"200": ok("Query result rows.", "ExecuteQueryEnvelope"), "default": err()},
+            consumes=["application/x-www-form-urlencoded"])),
+    ]
+    return build(
+        "SDP - Query",
+        "Read-only power tool for ManageEngine ServiceDesk Plus On-Premises: run one SQL SELECT "
+        "via the Execute Query report API to replace many REST GETs (JOINs, custom fields, "
+        "aggregates). Auth: technician API key in the 'authtoken' header; the SELECT is wrapped "
+        "in a single 'input_data' JSON envelope. Admin-scoped ('Create Query Report' permission) "
+        "and build/edition-gated — probe with 'SELECT 1 AS test' at setup and fall back to REST "
+        "if it errors. Physical schema names vary by build; keep SQL in the templates/ library.",
+        "/api/v3", ops, defs)
+
+
 CONNECTORS = {
     "sdp-service-desk": service_desk,
     "sdp-assets-cmdb-v3": assets_cmdb_v3,
+    "sdp-query": query,
 }
 
 
