@@ -1,0 +1,11 @@
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# Secrets (never commit); .env.example IS the committed template
+.env
+.env.*
+!.env.example
