@@ -1,0 +1,211 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "SDP - Service Desk",
+    "description": "Work with ManageEngine ServiceDesk Plus On-Premises service desk requests: list, get, and create requests on your own internet-published SDP instance. Authenticates with a technician/integration API key sent as the 'authtoken' header. All SDP parameters travel inside a single 'input_data' JSON envelope, per the SDP V3 API contract.",
+    "version": "0.1.0",
+    "contact": {
+      "name": "Peter Braun",
+      "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform"
+    }
+  },
+  "host": "sdp.example.com",
+  "basePath": "/api/v3",
+  "schemes": ["https"],
+  "produces": ["application/json"],
+  "securityDefinitions": {
+    "api_key": {
+      "type": "apiKey",
+      "in": "header",
+      "name": "authtoken"
+    }
+  },
+  "security": [{ "api_key": [] }],
+  "paths": {
+    "/requests": {
+      "get": {
+        "operationId": "ListRequests",
+        "summary": "List requests",
+        "description": "Lists service desk requests with pagination, sorting, and search criteria via the input_data envelope.",
+        "parameters": [
+          {
+            "name": "input_data",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "x-ms-summary": "Input Data (JSON)",
+            "x-ms-visibility": "important",
+            "default": "{\"list_info\":{\"row_count\":10,\"start_index\":1,\"get_total_count\":true}}",
+            "description": "SDP list_info envelope as a JSON string. Example: {\"list_info\":{\"row_count\":10,\"start_index\":1,\"get_total_count\":true,\"search_criteria\":{\"field\":\"status.name\",\"condition\":\"is\",\"value\":\"Open\"}}}. row_count max 100; dates use epoch milliseconds."
+          },
+          { "$ref": "#/parameters/AcceptHeader" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Request list returned",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "response_status": {
+                  "description": "SDP status envelope (object or array depending on build); success has status_code 2000.",
+                  "x-ms-summary": "Response Status"
+                },
+                "list_info": {
+                  "type": "object",
+                  "x-ms-summary": "List Info",
+                  "description": "Pagination state for the returned page.",
+                  "properties": {
+                    "has_more_rows": { "type": "boolean", "x-ms-summary": "Has More Rows" },
+                    "start_index": { "type": "integer", "x-ms-summary": "Start Index" },
+                    "row_count": { "type": "integer", "x-ms-summary": "Row Count" },
+                    "total_count": { "type": "integer", "x-ms-summary": "Total Count" }
+                  }
+                },
+                "requests": {
+                  "type": "array",
+                  "x-ms-summary": "Requests",
+                  "description": "The requests on this page.",
+                  "items": { "$ref": "#/definitions/RequestSummary" }
+                }
+              }
+            }
+          },
+          "default": { "description": "SDP error envelope (response_status.status_code != 2000)" }
+        }
+      },
+      "post": {
+        "operationId": "CreateRequest",
+        "summary": "Create request",
+        "description": "Creates a new service desk request from a request payload inside the input_data envelope.",
+        "consumes": ["application/x-www-form-urlencoded"],
+        "parameters": [
+          {
+            "name": "input_data",
+            "in": "formData",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "Input Data (JSON)",
+            "x-ms-visibility": "important",
+            "description": "SDP request payload as a JSON string. Only subject is required. Example: {\"request\":{\"subject\":\"Printer not working\",\"description\":\"Details here\",\"requester\":{\"email_id\":\"user@company.com\"},\"priority\":{\"name\":\"High\"},\"request_type\":{\"name\":\"Incident\"}}}"
+          },
+          { "$ref": "#/parameters/AcceptHeader" }
+        ],
+        "responses": {
+          "201": {
+            "description": "Request created",
+            "schema": { "$ref": "#/definitions/SingleRequestEnvelope" }
+          },
+          "200": {
+            "description": "Request created (builds that return 200)",
+            "schema": { "$ref": "#/definitions/SingleRequestEnvelope" }
+          },
+          "default": { "description": "SDP error envelope (response_status.status_code != 2000)" }
+        }
+      }
+    },
+    "/requests/{request_id}": {
+      "get": {
+        "operationId": "GetRequest",
+        "summary": "Get request",
+        "description": "Gets the full details of a single service desk request by its ID.",
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "Request ID",
+            "description": "The numeric ID of the request."
+          },
+          { "$ref": "#/parameters/AcceptHeader" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Request details returned",
+            "schema": { "$ref": "#/definitions/SingleRequestEnvelope" }
+          },
+          "default": { "description": "SDP error envelope (response_status.status_code != 2000)" }
+        }
+      }
+    }
+  },
+  "parameters": {
+    "AcceptHeader": {
+      "name": "Accept",
+      "in": "header",
+      "type": "string",
+      "required": false,
+      "default": "application/vnd.manageengine.sdp.v3+json",
+      "x-ms-summary": "Accept",
+      "x-ms-visibility": "internal",
+      "description": "SDP V3 media type; leave the default."
+    }
+  },
+  "definitions": {
+    "SdpName": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "x-ms-summary": "ID" },
+        "name": { "type": "string", "x-ms-summary": "Name" }
+      }
+    },
+    "SdpUser": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "x-ms-summary": "ID" },
+        "name": { "type": "string", "x-ms-summary": "Name" },
+        "email_id": { "type": "string", "x-ms-summary": "Email" }
+      }
+    },
+    "SdpTime": {
+      "type": "object",
+      "properties": {
+        "display_value": { "type": "string", "x-ms-summary": "Display Value" },
+        "value": { "type": "string", "x-ms-summary": "Value (epoch ms)" }
+      }
+    },
+    "RequestSummary": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "x-ms-summary": "Request ID" },
+        "subject": { "type": "string", "x-ms-summary": "Subject" },
+        "status": { "$ref": "#/definitions/SdpName" },
+        "priority": { "$ref": "#/definitions/SdpName" },
+        "created_time": { "$ref": "#/definitions/SdpTime" },
+        "requester": { "$ref": "#/definitions/SdpUser" },
+        "technician": { "$ref": "#/definitions/SdpUser" },
+        "group": { "$ref": "#/definitions/SdpName" },
+        "site": { "$ref": "#/definitions/SdpName" },
+        "due_by_time": { "$ref": "#/definitions/SdpTime" },
+        "is_overdue": { "type": "boolean", "x-ms-summary": "Is Overdue" }
+      }
+    },
+    "RequestDetail": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "x-ms-summary": "Request ID" },
+        "subject": { "type": "string", "x-ms-summary": "Subject" },
+        "description": { "type": "string", "x-ms-summary": "Description" },
+        "status": { "$ref": "#/definitions/SdpName" },
+        "priority": { "$ref": "#/definitions/SdpName" },
+        "request_type": { "$ref": "#/definitions/SdpName" },
+        "created_time": { "$ref": "#/definitions/SdpTime" },
+        "due_by_time": { "$ref": "#/definitions/SdpTime" },
+        "requester": { "$ref": "#/definitions/SdpUser" },
+        "technician": { "$ref": "#/definitions/SdpUser" },
+        "group": { "$ref": "#/definitions/SdpName" },
+        "site": { "$ref": "#/definitions/SdpName" }
+      }
+    },
+    "SingleRequestEnvelope": {
+      "type": "object",
+      "properties": {
+        "response_status": {
+          "description": "SDP status envelope (object or array depending on build); success has status_code 2000.",
+          "x-ms-summary": "Response Status"
+        },
+        "request": { "$ref": "#/definitions/RequestDetail" }
+      }
+    }
+  }
+}
