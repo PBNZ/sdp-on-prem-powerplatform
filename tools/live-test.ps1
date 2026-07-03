@@ -13,12 +13,12 @@
   a disposable instance you own — never the demo.
 
 .EXAMPLE
-  # Read-only smoke test against the demo
-  ./tools/live-test.ps1 -Host demo.servicedeskplus.com -ApiKey <your-api-key>
+  # Read-only smoke test against the demo (use the demo key from PRD.md / README)
+  ./tools/live-test.ps1 -HostName demo.servicedeskplus.com -ApiKey <your-api-key>
 
 .EXAMPLE
   # Full test incl. create, against a local disposable instance
-  ./tools/live-test.ps1 -Host localhost:8080 -ApiKey <key> -IncludeCreate -SkipCertCheck
+  ./tools/live-test.ps1 -HostName localhost:8080 -ApiKey <key> -IncludeCreate -SkipCertCheck
 #>
 [CmdletBinding()]
 param(
