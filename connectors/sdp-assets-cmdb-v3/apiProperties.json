@@ -1,0 +1,21 @@
+{
+  "properties": {
+    "connectionParameters": {
+      "api_key": {
+        "type": "securestring",
+        "uiDefinition": {
+          "displayName": "API Key (authtoken)",
+          "description": "The ServiceDesk Plus technician/integration API key. Sent as the 'authtoken' HTTP header on every call. Generate it in SDP under Admin > Technicians > Generate API Key and scope it to a least-privilege role.",
+          "tooltip": "Provide your ServiceDesk Plus technician API key",
+          "constraints": {
+            "tabIndex": 2,
+            "clearText": false,
+            "required": "true"
+          }
+        }
+      }
+    },
+    "iconBrandColor": "#106EBE",
+    "capabilities": ["gateway", "cloud"]
+  }
+}

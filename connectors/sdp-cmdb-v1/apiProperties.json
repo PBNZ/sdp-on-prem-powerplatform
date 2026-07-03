@@ -1,0 +1,21 @@
+{
+  "properties": {
+    "connectionParameters": {
+      "technician_key": {
+        "type": "securestring",
+        "uiDefinition": {
+          "displayName": "Technician Key (TECHNICIAN_KEY)",
+          "description": "The ServiceDesk Plus technician/integration API key (the same secret used as 'authtoken' for the V3 connectors). Sent as the 'TECHNICIAN_KEY' query parameter. Because it travels in the URL, HTTPS is mandatory; scope the key to a least-privilege role.",
+          "tooltip": "Provide your ServiceDesk Plus technician API key",
+          "constraints": {
+            "tabIndex": 2,
+            "clearText": false,
+            "required": "true"
+          }
+        }
+      }
+    },
+    "iconBrandColor": "#106EBE",
+    "capabilities": ["gateway", "cloud"]
+  }
+}

@@ -1,0 +1,832 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "SDP - Assets & CMDB (v3)",
+    "description": "Manage ManageEngine ServiceDesk Plus On-Premises assets and the CMDB (v3 JSON API): CI types, configuration items per type and across the CMDB, CI metadata, association relationships, and assets. Auth: technician API key in the 'authtoken' header; every parameter is wrapped in a single 'input_data' JSON envelope. Full CMDB v3 requires SDP build 15100+ (or AssetExplorer 7700+).",
+    "version": "0.2.0",
+    "contact": {
+      "name": "Peter Braun",
+      "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform"
+    }
+  },
+  "host": "sdp.example.com",
+  "basePath": "/api/v3",
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "securityDefinitions": {
+    "api_key": {
+      "type": "apiKey",
+      "in": "header",
+      "name": "authtoken"
+    }
+  },
+  "security": [
+    {
+      "api_key": []
+    }
+  ],
+  "paths": {
+    "/ci_types": {
+      "get": {
+        "operationId": "ListCITypes",
+        "summary": "List CI types",
+        "description": "Lists all CMDB configuration-item types. Each has an api_plural_name used as the CI Type path segment.",
+        "parameters": [
+          {
+            "name": "input_data",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "x-ms-summary": "Input Data (JSON)",
+            "x-ms-visibility": "important",
+            "description": "Lists all CMDB configuration-item types. Each has an api_plural_name used as the CI Type path segment. Uses the list_info envelope.",
+            "default": "{\"list_info\":{\"row_count\":100,\"start_index\":1,\"get_total_count\":true}}"
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List CI types returned.",
+            "schema": {
+              "$ref": "#/definitions/CITypeListEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        }
+      }
+    },
+    "/cmdb": {
+      "get": {
+        "operationId": "ListAllCIs",
+        "summary": "List all CIs",
+        "description": "Lists all configuration items across every type.",
+        "parameters": [
+          {
+            "name": "input_data",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "x-ms-summary": "Input Data (JSON)",
+            "x-ms-visibility": "important",
+            "description": "Lists all configuration items across every type. Uses the list_info envelope.",
+            "default": "{\"list_info\":{\"row_count\":10,\"start_index\":1,\"get_total_count\":true}}"
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List all CIs returned.",
+            "schema": {
+              "$ref": "#/definitions/CIListEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        }
+      }
+    },
+    "/{ci_type}": {
+      "get": {
+        "operationId": "ListCIsByType",
+        "summary": "List CIs by type",
+        "description": "Lists configuration items of one CI type. Set CI Type to the type's api_plural_name (from List CI types).",
+        "parameters": [
+          {
+            "name": "ci_type",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "CI Type (api_plural_name)",
+            "description": "The CI type's api_plural_name, e.g. cmdb_businessservice."
+          },
+          {
+            "name": "input_data",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "x-ms-summary": "Input Data (JSON)",
+            "x-ms-visibility": "important",
+            "description": "list_info envelope as a JSON string.",
+            "default": "{\"list_info\":{\"row_count\":10,\"start_index\":1,\"get_total_count\":true}}"
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "CIs returned.",
+            "schema": {
+              "$ref": "#/definitions/CIListEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        }
+      },
+      "post": {
+        "operationId": "CreateCI",
+        "summary": "Create CI",
+        "description": "Creates a configuration item of the given type. The input_data payload wraps the CI object; confirm the field set against the type's metadata.",
+        "parameters": [
+          {
+            "name": "ci_type",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "CI Type (api_plural_name)",
+            "description": "The CI type's api_plural_name."
+          },
+          {
+            "name": "input_data",
+            "in": "formData",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "Input Data (JSON)",
+            "x-ms-visibility": "important",
+            "description": "Creates a configuration item of the given type. The input_data payload wraps the CI object; confirm the field set against the type's metadata. Example: {\"ci\":{\"name\":\"web01\",\"ci_type\":{\"name\":\"Business Service\"}}}"
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Create CI created.",
+            "schema": {
+              "$ref": "#/definitions/CIEnvelope"
+            }
+          },
+          "200": {
+            "description": "Create CI created (builds returning 200).",
+            "schema": {
+              "$ref": "#/definitions/CIEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        },
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ]
+      }
+    },
+    "/{ci_type}/{ci_id}": {
+      "get": {
+        "operationId": "GetCI",
+        "summary": "Get CI",
+        "description": "Gets a single configuration item by type and ID.",
+        "parameters": [
+          {
+            "name": "ci_type",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "CI Type (api_plural_name)",
+            "description": "The CI type's api_plural_name."
+          },
+          {
+            "name": "ci_id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "CI ID",
+            "description": "The numeric CI ID."
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "CI returned.",
+            "schema": {
+              "$ref": "#/definitions/CIEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        }
+      },
+      "put": {
+        "operationId": "UpdateCI",
+        "summary": "Update CI",
+        "description": "Updates a configuration item by type and ID (V3 updates by CI ID only, no criteria-based update).",
+        "parameters": [
+          {
+            "name": "ci_type",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "CI Type (api_plural_name)",
+            "description": "The CI type's api_plural_name."
+          },
+          {
+            "name": "ci_id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "CI ID",
+            "description": "The numeric CI ID."
+          },
+          {
+            "name": "input_data",
+            "in": "formData",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "Input Data (JSON)",
+            "x-ms-visibility": "important",
+            "description": "CI payload. Example: {\"ci\":{\"name\":\"web01-renamed\"}}"
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "CI updated.",
+            "schema": {
+              "$ref": "#/definitions/CIEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        },
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ]
+      }
+    },
+    "/{ci_type}/_metadata": {
+      "get": {
+        "operationId": "GetCITypeMetadata",
+        "summary": "Get CI type metadata",
+        "description": "Gets the field/layout metadata for a CI type (its api_plural_name).",
+        "parameters": [
+          {
+            "name": "ci_type",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "CI Type (api_plural_name)",
+            "description": "The CI type's api_plural_name."
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Metadata returned.",
+            "schema": {
+              "$ref": "#/definitions/MetadataEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        }
+      }
+    },
+    "/{ci_type}/{ci_id}/assoc_ci_relationships": {
+      "get": {
+        "operationId": "ListCIRelationships",
+        "summary": "List CI relationships",
+        "description": "Lists the association relationships of a CI (V3; requires SDP build 15100+).",
+        "parameters": [
+          {
+            "name": "ci_type",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "CI Type (api_plural_name)",
+            "description": "The CI type's api_plural_name."
+          },
+          {
+            "name": "ci_id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "CI ID",
+            "description": "The numeric CI ID."
+          },
+          {
+            "name": "input_data",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "x-ms-summary": "Input Data (JSON)",
+            "x-ms-visibility": "important",
+            "description": "Optional filter, e.g. {\"list_info\":{\"filter\":{\"name\":\"get_all_association\"}}}"
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Relationships returned.",
+            "schema": {
+              "$ref": "#/definitions/RelationshipListEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        }
+      },
+      "post": {
+        "operationId": "AddCIRelationship",
+        "summary": "Add CI relationship",
+        "description": "Adds an association relationship to a CI (V3; requires SDP build 15100+).",
+        "parameters": [
+          {
+            "name": "ci_type",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "CI Type (api_plural_name)",
+            "description": "The CI type's api_plural_name."
+          },
+          {
+            "name": "ci_id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "CI ID",
+            "description": "The numeric CI ID."
+          },
+          {
+            "name": "input_data",
+            "in": "formData",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "Input Data (JSON)",
+            "x-ms-visibility": "important",
+            "description": "Adds an association relationship to a CI (V3; requires SDP build 15100+). Example: {\"assoc_ci_relationship\":{\"end_ci\":{\"id\":\"123\"},\"relationship\":{\"id\":\"1\"}}}"
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Add CI relationship created.",
+            "schema": {
+              "$ref": "#/definitions/RelationshipListEnvelope"
+            }
+          },
+          "200": {
+            "description": "Add CI relationship created (builds returning 200).",
+            "schema": {
+              "$ref": "#/definitions/RelationshipListEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        },
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ]
+      }
+    },
+    "/asset_modules": {
+      "get": {
+        "operationId": "ListAssetModules",
+        "summary": "List asset modules",
+        "description": "Lists the asset type/module hierarchy.",
+        "parameters": [
+          {
+            "name": "input_data",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "x-ms-summary": "Input Data (JSON)",
+            "x-ms-visibility": "important",
+            "description": "Lists the asset type/module hierarchy. Uses the list_info envelope.",
+            "default": "{\"list_info\":{\"row_count\":10,\"start_index\":1,\"get_total_count\":true}}"
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List asset modules returned.",
+            "schema": {
+              "$ref": "#/definitions/AssetModuleListEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        }
+      }
+    },
+    "/assets": {
+      "get": {
+        "operationId": "ListAssets",
+        "summary": "List assets",
+        "description": "Lists assets with pagination and search criteria.",
+        "parameters": [
+          {
+            "name": "input_data",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "x-ms-summary": "Input Data (JSON)",
+            "x-ms-visibility": "important",
+            "description": "Lists assets with pagination and search criteria. Uses the list_info envelope.",
+            "default": "{\"list_info\":{\"row_count\":10,\"start_index\":1,\"get_total_count\":true}}"
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List assets returned.",
+            "schema": {
+              "$ref": "#/definitions/AssetListEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        }
+      }
+    },
+    "/assets/{asset_id}": {
+      "get": {
+        "operationId": "GetAsset",
+        "summary": "Get asset",
+        "description": "Gets a single asset by its ID.",
+        "parameters": [
+          {
+            "name": "asset_id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "Asset ID",
+            "description": "Asset ID."
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get asset returned.",
+            "schema": {
+              "$ref": "#/definitions/AssetEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        }
+      },
+      "put": {
+        "operationId": "UpdateAsset",
+        "summary": "Update asset",
+        "description": "Updates an existing asset; only provided fields change.",
+        "parameters": [
+          {
+            "name": "asset_id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "Asset ID",
+            "description": "Asset ID."
+          },
+          {
+            "name": "input_data",
+            "in": "formData",
+            "type": "string",
+            "required": true,
+            "x-ms-summary": "Input Data (JSON)",
+            "x-ms-visibility": "important",
+            "description": "Updates an existing asset; only provided fields change. Example: {\"asset\":{\"asset_state\":{\"name\":\"In Use\"}}}"
+          },
+          {
+            "$ref": "#/parameters/AcceptHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Update asset updated.",
+            "schema": {
+              "$ref": "#/definitions/AssetEnvelope"
+            }
+          },
+          "default": {
+            "description": "SDP error envelope (response_status.status_code != 2000)."
+          }
+        },
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ]
+      }
+    }
+  },
+  "parameters": {
+    "AcceptHeader": {
+      "name": "Accept",
+      "in": "header",
+      "type": "string",
+      "required": false,
+      "default": "application/vnd.manageengine.sdp.v3+json",
+      "x-ms-summary": "Accept",
+      "x-ms-visibility": "internal",
+      "description": "SDP V3 media type; leave the default."
+    }
+  },
+  "definitions": {
+    "SdpName": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "x-ms-summary": "ID"
+        },
+        "name": {
+          "type": "string",
+          "x-ms-summary": "Name"
+        }
+      }
+    },
+    "SdpUser": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "x-ms-summary": "ID"
+        },
+        "name": {
+          "type": "string",
+          "x-ms-summary": "Name"
+        },
+        "email_id": {
+          "type": "string",
+          "x-ms-summary": "Email"
+        }
+      }
+    },
+    "SdpTime": {
+      "type": "object",
+      "properties": {
+        "display_value": {
+          "type": "string",
+          "x-ms-summary": "Display Value"
+        },
+        "value": {
+          "type": "string",
+          "x-ms-summary": "Value (epoch ms)"
+        }
+      }
+    },
+    "ResponseStatus": {
+      "description": "SDP status envelope (object or array by build); success has status_code 2000.",
+      "x-ms-summary": "Response Status"
+    },
+    "ListInfo": {
+      "type": "object",
+      "x-ms-summary": "List Info",
+      "properties": {
+        "has_more_rows": {
+          "type": "boolean",
+          "x-ms-summary": "Has More Rows"
+        },
+        "start_index": {
+          "type": "integer",
+          "x-ms-summary": "Start Index"
+        },
+        "row_count": {
+          "type": "integer",
+          "x-ms-summary": "Row Count"
+        },
+        "total_count": {
+          "type": "integer",
+          "x-ms-summary": "Total Count"
+        }
+      }
+    },
+    "CIType": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "x-ms-summary": "CI Type ID"
+        },
+        "display_name": {
+          "type": "string",
+          "x-ms-summary": "Display Name"
+        },
+        "api_plural_name": {
+          "type": "string",
+          "x-ms-summary": "API Plural Name",
+          "description": "Use this value as the CI Type path segment in the CI operations."
+        },
+        "description": {
+          "type": "string",
+          "x-ms-summary": "Description"
+        }
+      }
+    },
+    "ConfigurationItem": {
+      "type": "object",
+      "x-ms-summary": "Configuration Item",
+      "description": "A CMDB configuration item. Fields vary by CI type; see the type's _metadata.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "x-ms-summary": "CI ID"
+        },
+        "name": {
+          "type": "string",
+          "x-ms-summary": "Name"
+        },
+        "ci_type": {
+          "$ref": "#/definitions/SdpName"
+        }
+      }
+    },
+    "AssetSummary": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "x-ms-summary": "Asset ID"
+        },
+        "name": {
+          "type": "string",
+          "x-ms-summary": "Name"
+        },
+        "product_type": {
+          "$ref": "#/definitions/SdpName"
+        },
+        "asset_state": {
+          "$ref": "#/definitions/SdpName"
+        },
+        "site": {
+          "$ref": "#/definitions/SdpName"
+        },
+        "department": {
+          "$ref": "#/definitions/SdpName"
+        }
+      }
+    },
+    "Relationship": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "x-ms-summary": "Relationship ID"
+        },
+        "relationship_type": {
+          "$ref": "#/definitions/SdpName"
+        }
+      }
+    },
+    "CITypeListEnvelope": {
+      "type": "object",
+      "properties": {
+        "response_status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "list_info": {
+          "$ref": "#/definitions/ListInfo"
+        },
+        "ci_types": {
+          "type": "array",
+          "x-ms-summary": "Ci Types",
+          "items": {
+            "$ref": "#/definitions/CIType"
+          }
+        }
+      }
+    },
+    "CIListEnvelope": {
+      "type": "object",
+      "properties": {
+        "response_status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "list_info": {
+          "$ref": "#/definitions/ListInfo"
+        },
+        "cmdb": {
+          "type": "array",
+          "x-ms-summary": "Configuration Items",
+          "items": {
+            "$ref": "#/definitions/ConfigurationItem"
+          }
+        }
+      }
+    },
+    "CIEnvelope": {
+      "type": "object",
+      "properties": {
+        "response_status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "ci": {
+          "$ref": "#/definitions/ConfigurationItem"
+        }
+      }
+    },
+    "MetadataEnvelope": {
+      "type": "object",
+      "properties": {
+        "response_status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "metadata": {
+          "type": "object",
+          "x-ms-summary": "Metadata"
+        }
+      }
+    },
+    "RelationshipListEnvelope": {
+      "type": "object",
+      "properties": {
+        "response_status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "list_info": {
+          "$ref": "#/definitions/ListInfo"
+        },
+        "assoc_ci_relationships": {
+          "type": "array",
+          "x-ms-summary": "Assoc Ci Relationships",
+          "items": {
+            "$ref": "#/definitions/Relationship"
+          }
+        }
+      }
+    },
+    "AssetListEnvelope": {
+      "type": "object",
+      "properties": {
+        "response_status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "list_info": {
+          "$ref": "#/definitions/ListInfo"
+        },
+        "assets": {
+          "type": "array",
+          "x-ms-summary": "Assets",
+          "items": {
+            "$ref": "#/definitions/AssetSummary"
+          }
+        }
+      }
+    },
+    "AssetEnvelope": {
+      "type": "object",
+      "properties": {
+        "response_status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "asset": {
+          "$ref": "#/definitions/AssetSummary"
+        }
+      }
+    },
+    "AssetModuleListEnvelope": {
+      "type": "object",
+      "properties": {
+        "response_status": {
+          "$ref": "#/definitions/ResponseStatus"
+        },
+        "list_info": {
+          "$ref": "#/definitions/ListInfo"
+        },
+        "asset_modules": {
+          "type": "array",
+          "x-ms-summary": "Asset Modules",
+          "items": {
+            "$ref": "#/definitions/SdpName"
+          }
+        }
+      }
+    }
+  }
+}

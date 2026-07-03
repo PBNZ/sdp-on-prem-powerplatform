@@ -1,0 +1,17 @@
+# Phase 2 verification — SDP demo (read-only), 2026-07-03T23:18:20Z
+## V3 Assets & CMDB (authtoken header, input_data JSON)
+GET /api/v3/ci_types               HTTP 200  "status_code":2000
+GET /api/v3/cmdb                   HTTP 200  "status_code":2000
+GET /api/v3/assets                 HTTP 200  "status_code":2000
+GET /api/v3/asset_modules          HTTP 200  "status_code":2000
+GET /api/v3/cmdb_businessservice   HTTP 200  "status_code":2000
+GET /api/v3/{ci_type}/_metadata (no input_data) HTTP 200  "status_code":2000
+GET .../4503/assoc_ci_relationships HTTP 200  "status_code":2000
+
+## V1 legacy CMDB (TECHNICIAN_KEY query param, JSON envelope)
+GET /api/cmdb/ci/list/all          HTTP 200  "statuscode":200
+GET /api/cmdb/ci/count/all         HTTP 200  "statuscode":200
+
+# Note: V3 assoc_ci_relationships works here (demo build is 15100+).
+# V1 cirelationships/{ci_name} is the documented fallback for builds <15100 and
+# is superseded by V3 on this build; modeled from the working V1 client (cmdb-v1-client.ts).

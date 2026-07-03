@@ -329,7 +329,7 @@ def service_desk():
             "Lists worklogs (time entries) for a request.", *rid, "WorklogListEnvelope", use_input=True)),
         ("/requests/{request_id}/worklogs", "post", create_op("AddRequestWorklog", "Add request worklog",
             "Adds a worklog (time entry) to a request.",
-            '{"worklog":{"description":"1h investigation","time_spent":{"hours":1}}}', "WorklogEnvelope",
+            '{"worklog":{"description":"Investigated the issue","owner":{"email_id":"tech@company.com"}}}', "WorklogEnvelope",
             extra_path=[path_param("request_id", "Request ID", "Request ID.")])),
         ("/requests/{request_id}/tasks", "get", get_op("ListRequestTasks", "List request tasks",
             "Lists tasks associated with a request.", *rid, "TaskListEnvelope", use_input=True)),
@@ -410,8 +410,119 @@ def service_desk():
         "/api/v3", ops, defs)
 
 
+# ---------------------------------------------------------------------------
+# SDP – Assets & CMDB (v3) connector
+# ---------------------------------------------------------------------------
+
+def assets_cmdb_v3():
+    name, user, time, status, list_info = common_defs()
+    ci_obj = {"type": "object", "x-ms-summary": "Configuration Item",
+              "description": "A CMDB configuration item. Fields vary by CI type; see the type's _metadata.",
+              "properties": {
+                  "id": {"type": "string", "x-ms-summary": "CI ID"},
+                  "name": {"type": "string", "x-ms-summary": "Name"},
+                  "ci_type": ref("SdpName")}}
+    defs = {
+        "SdpName": name, "SdpUser": user, "SdpTime": time,
+        "ResponseStatus": status, "ListInfo": list_info,
+        "CIType": {"type": "object", "properties": {
+            "id": {"type": "string", "x-ms-summary": "CI Type ID"},
+            "display_name": {"type": "string", "x-ms-summary": "Display Name"},
+            "api_plural_name": {"type": "string", "x-ms-summary": "API Plural Name",
+                                "description": "Use this value as the CI Type path segment in the CI operations."},
+            "description": {"type": "string", "x-ms-summary": "Description"}}},
+        "ConfigurationItem": ci_obj,
+        "AssetSummary": {"type": "object", "properties": {
+            "id": {"type": "string", "x-ms-summary": "Asset ID"},
+            "name": {"type": "string", "x-ms-summary": "Name"},
+            "product_type": ref("SdpName"), "asset_state": ref("SdpName"),
+            "site": ref("SdpName"), "department": ref("SdpName")}},
+        "Relationship": {"type": "object", "properties": {
+            "id": {"type": "string", "x-ms-summary": "Relationship ID"},
+            "relationship_type": ref("SdpName")}},
+        "CITypeListEnvelope": list_envelope("ci_types", "CIType"),
+        "CIListEnvelope": {"type": "object", "properties": {
+            "response_status": ref("ResponseStatus"), "list_info": ref("ListInfo"),
+            "cmdb": {"type": "array", "x-ms-summary": "Configuration Items", "items": ref("ConfigurationItem")}}},
+        "CIEnvelope": single_envelope("ci", "ConfigurationItem"),
+        "MetadataEnvelope": {"type": "object", "properties": {
+            "response_status": ref("ResponseStatus"),
+            "metadata": {"type": "object", "x-ms-summary": "Metadata"}}},
+        "RelationshipListEnvelope": list_envelope("assoc_ci_relationships", "Relationship"),
+        "AssetListEnvelope": list_envelope("assets", "AssetSummary"),
+        "AssetEnvelope": single_envelope("asset", "AssetSummary"),
+        "AssetModuleListEnvelope": list_envelope("asset_modules", "SdpName"),
+    }
+    LIST_DEFAULT = '{"list_info":{"row_count":10,"start_index":1,"get_total_count":true}}'
+    cit = ("ci_type", "CI Type (api_plural_name)")
+    ciid = ("ci_id", "CI ID")
+
+    ops = [
+        ("/ci_types", "get", list_op("ListCITypes", "List CI types",
+            "Lists all CMDB configuration-item types. Each has an api_plural_name used as the CI Type path segment.",
+            '{"list_info":{"row_count":100,"start_index":1,"get_total_count":true}}', "CITypeListEnvelope")),
+        ("/cmdb", "get", list_op("ListAllCIs", "List all CIs",
+            "Lists all configuration items across every type.", LIST_DEFAULT, "CIListEnvelope")),
+        ("/{ci_type}", "get", op("ListCIsByType", "List CIs by type",
+            "Lists configuration items of one CI type. Set CI Type to the type's api_plural_name (from List CI types).",
+            [path_param("ci_type", "CI Type (api_plural_name)", "The CI type's api_plural_name, e.g. cmdb_businessservice."),
+             input_data_query(LIST_DEFAULT, "list_info envelope as a JSON string."), accept_ref()],
+            {"200": ok("CIs returned.", "CIListEnvelope"), "default": err()})),
+        ("/{ci_type}", "post", create_op("CreateCI", "Create CI",
+            "Creates a configuration item of the given type. The input_data payload wraps the CI object; confirm the field set against the type's metadata.",
+            '{"ci":{"name":"web01","ci_type":{"name":"Business Service"}}}', "CIEnvelope",
+            extra_path=[path_param("ci_type", "CI Type (api_plural_name)", "The CI type's api_plural_name.")])),
+        ("/{ci_type}/{ci_id}", "get", op("GetCI", "Get CI",
+            "Gets a single configuration item by type and ID.",
+            [path_param("ci_type", "CI Type (api_plural_name)", "The CI type's api_plural_name."),
+             path_param("ci_id", "CI ID", "The numeric CI ID."), accept_ref()],
+            {"200": ok("CI returned.", "CIEnvelope"), "default": err()})),
+        ("/{ci_type}/{ci_id}", "put", op("UpdateCI", "Update CI",
+            "Updates a configuration item by type and ID (V3 updates by CI ID only, no criteria-based update).",
+            [path_param("ci_type", "CI Type (api_plural_name)", "The CI type's api_plural_name."),
+             path_param("ci_id", "CI ID", "The numeric CI ID."),
+             input_data_form('CI payload. Example: {"ci":{"name":"web01-renamed"}}'), accept_ref()],
+            {"200": ok("CI updated.", "CIEnvelope"), "default": err()},
+            consumes=["application/x-www-form-urlencoded"])),
+        ("/{ci_type}/_metadata", "get", op("GetCITypeMetadata", "Get CI type metadata",
+            "Gets the field/layout metadata for a CI type (its api_plural_name).",
+            [path_param("ci_type", "CI Type (api_plural_name)", "The CI type's api_plural_name."), accept_ref()],
+            {"200": ok("Metadata returned.", "MetadataEnvelope"), "default": err()})),
+        ("/{ci_type}/{ci_id}/assoc_ci_relationships", "get", op("ListCIRelationships", "List CI relationships",
+            "Lists the association relationships of a CI (V3; requires SDP build 15100+).",
+            [path_param("ci_type", "CI Type (api_plural_name)", "The CI type's api_plural_name."),
+             path_param("ci_id", "CI ID", "The numeric CI ID."),
+             input_data_query(desc='Optional filter, e.g. {"list_info":{"filter":{"name":"get_all_association"}}}'),
+             accept_ref()],
+            {"200": ok("Relationships returned.", "RelationshipListEnvelope"), "default": err()})),
+        ("/{ci_type}/{ci_id}/assoc_ci_relationships", "post", create_op("AddCIRelationship", "Add CI relationship",
+            "Adds an association relationship to a CI (V3; requires SDP build 15100+).",
+            '{"assoc_ci_relationship":{"end_ci":{"id":"123"},"relationship":{"id":"1"}}}', "RelationshipListEnvelope",
+            extra_path=[path_param("ci_type", "CI Type (api_plural_name)", "The CI type's api_plural_name."),
+                        path_param("ci_id", "CI ID", "The numeric CI ID.")])),
+        ("/asset_modules", "get", list_op("ListAssetModules", "List asset modules",
+            "Lists the asset type/module hierarchy.", LIST_DEFAULT, "AssetModuleListEnvelope")),
+        ("/assets", "get", list_op("ListAssets", "List assets",
+            "Lists assets with pagination and search criteria.", LIST_DEFAULT, "AssetListEnvelope")),
+        ("/assets/{asset_id}", "get", get_op("GetAsset", "Get asset",
+            "Gets a single asset by its ID.", "asset_id", "Asset ID", "AssetEnvelope")),
+        ("/assets/{asset_id}", "put", update_op("UpdateAsset", "Update asset",
+            "Updates an existing asset; only provided fields change.", "asset_id", "Asset ID",
+            '{"asset":{"asset_state":{"name":"In Use"}}}', "AssetEnvelope")),
+    ]
+    return build(
+        "SDP - Assets & CMDB (v3)",
+        "Manage ManageEngine ServiceDesk Plus On-Premises assets and the CMDB (v3 JSON API): "
+        "CI types, configuration items per type and across the CMDB, CI metadata, association "
+        "relationships, and assets. Auth: technician API key in the 'authtoken' header; every "
+        "parameter is wrapped in a single 'input_data' JSON envelope. Full CMDB v3 requires SDP "
+        "build 15100+ (or AssetExplorer 7700+).",
+        "/api/v3", ops, defs)
+
+
 CONNECTORS = {
     "sdp-service-desk": service_desk,
+    "sdp-assets-cmdb-v3": assets_cmdb_v3,
 }
 
 

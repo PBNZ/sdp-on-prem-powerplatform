@@ -392,7 +392,7 @@
             "required": true,
             "x-ms-summary": "Input Data (JSON)",
             "x-ms-visibility": "important",
-            "description": "Adds a worklog (time entry) to a request. Example: {\"worklog\":{\"description\":\"1h investigation\",\"time_spent\":{\"hours\":1}}}"
+            "description": "Adds a worklog (time entry) to a request. Example: {\"worklog\":{\"description\":\"Investigated the issue\",\"owner\":{\"email_id\":\"tech@company.com\"}}}"
           },
           {
             "$ref": "#/parameters/AcceptHeader"
