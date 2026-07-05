@@ -20,24 +20,29 @@ confirmed on two real builds. Connector response schemas therefore leave `respon
 untyped, and any consumer/policy must handle both shapes (the sibling MCP client already does:
 `Array.isArray(rawStatus) ? rawStatus[0] : rawStatus`).
 
-## Local SDP write-testing is blocked on minting a technician API key
+## SDP trial expires (~30 days) → redeploy to reset it; fresh install fixes the admin-login blocker
 
-The sibling project's WSL2 SDP 14990 instance starts fine (Postgres 65432, Tomcat on
-**HTTPS** 8080 — plain HTTP 8080 returns "This combination of host and port requires TLS") and
-its `/api/v3` API routes correctly (returns SDP's own auth envelope, proving the connector's
-path + `authtoken` header + `input_data` shape are accepted by a real on-prem build). But:
-- `administrator`/`administrator` (the RUNBOOK default) is rejected on this May-restored
-  instance (`loginError=true`), so the SDP UI's "Generate API Key" path is unavailable.
-- The `techniciankeydefinition.techniciankey` column is `bytea`, AES-encrypted with SDP's
-  install-time key — a raw plaintext `INSERT` authenticates as invalid (`4000/401`). Forging a
-  valid row needs SDP's internal crypto (reusable in principle via its own jars, e.g.
-  `com.manageengine.servicedesk.tools.DecryptPostgresPassword`, but a deep yak).
+The WSL2 SDP 14990 starts fine (Postgres 65432, Tomcat on **HTTPS** 8080 — plain HTTP 8080 returns
+"This combination of host and port requires TLS") and its `/api/v3` routes correctly (returns
+SDP's own auth envelope, proving the connector path + `authtoken` header + `input_data` shape are
+accepted by a real on-prem build).
 
-Net: reads are fully verified live (demo, 2xx); the create/write path is authored and
-structurally validated but its live 2xx is **pending a valid technician key on a disposable
-instance**. Unblock in seconds once Peter's real admin password is known: log into the local
-SDP UI → Admin → Technicians → Generate API Key, then run
-`tools/live-test.ps1 -HostName localhost:8080 -ApiKey <key> -IncludeCreate -SkipCertCheck`.
+The earlier write-test blocker was two-fold, and **both are resolved by a fresh reinstall**:
+- SDP's eval clock is install-date-based. The May-14 install aged past ~30 days and flipped to
+  *"trial expired → free version"*. There is no in-place extend; a **fresh install to a clean
+  dir resets it** (move the old `ManageEngine` dir aside, rerun `install.exp`). Redone 2026-07-06.
+- On the *restored/aged* instance, `administrator`/`administrator` was rejected, so the UI's
+  "Generate API Key" path was unavailable. **On the fresh install the default admin login works**
+  (verified 2026-07-06: `SDPSESSIONID` session cookie, hidden CSRF field `sdplogincsrfparam`,
+  `AUTHRULE_NAME=RememberMeLoginModule`, POST `/j_security_check` → authenticated home page).
+- The `techniciankeydefinition.techniciankey` column is still `bytea` AES-encrypted with SDP's
+  install-time key, so you can't `INSERT` a key — you must let the app generate it (now possible
+  via the working admin login).
+
+Net: reads are fully verified live (demo, 2xx); the create/write path is authored + structurally
+validated, its live 2xx now **only needs the key generated in the browser** (Admin → Technicians →
+Generate API Key) then `tools/live-test.ps1 -HostName localhost:8080 -ApiKey <key> -IncludeCreate
+-SkipCertCheck`. Full deploy/redeploy procedure: `docs/deploy-sdp-wsl2.md`.
 
 ## Some SDP GET endpoints reject input_data entirely
 

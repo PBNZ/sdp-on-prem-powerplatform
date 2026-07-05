@@ -33,12 +33,13 @@
 
 ## Known gap (see LESSONS.md)
 
-- **Create/write live 2xx is pending a valid technician API key** on a disposable instance. The
-  WSL2 SDP 14990 runs and its `/api/v3` API routes correctly (returns SDP's auth envelope), but
-  the RUNBOOK-default admin password is rejected on this restored instance and the API-key
-  column is AES-encrypted, so no key can be minted headlessly. Unblock: log into local SDP UI →
-  Admin → Technicians → Generate API Key, then
+- **Create/write live 2xx is pending running the smoke test with a technician API key.** The WSL2
+  SDP 14990 was **redeployed fresh 2026-07-06** (the May install's trial had expired → free
+  version). It runs on HTTPS :8080, `/api/v3` routes correctly, and — on the fresh install —
+  **default `administrator`/`administrator` login works**, so a key can now be minted in the
+  browser. Unblock: log into https://localhost:8080 → Admin → Technicians → Generate API Key, then
   `tools/live-test.ps1 -HostName localhost:8080 -ApiKey <key> -IncludeCreate -SkipCertCheck`.
+  Full procedure: `docs/deploy-sdp-wsl2.md`.
 
 ## Exact next step
 

@@ -84,8 +84,9 @@ and regenerate the schema map with `pg_dump --schema-only` (see the sibling proj
   verified live.
 - **Writes** (create/update/delete/close, CI writes, relationship writes): authored and
   structurally verified (valid Swagger 2.0, fresh-context reviewed), but a live write **2xx is
-  pending a valid technician API key on a disposable instance** — see [`LESSONS.md`](LESSONS.md).
-  Never write to the shared demo.
+  pending running the smoke test with a technician API key on a disposable instance**. A fresh
+  WSL2 SDP 14990 is stood up for exactly this — see [`docs/deploy-sdp-wsl2.md`](docs/deploy-sdp-wsl2.md)
+  to mint a key and run `tools/live-test.ps1 -IncludeCreate`. Never write to the shared demo.
 - Each connector was reviewed by a fresh-context verifier subagent against the Power Platform
   rules and the SDP API contract.
 
@@ -96,6 +97,7 @@ connectors/           one folder per connector (definition + properties + README
 templates/            Execute-Query SQL template library (build-14990 schema)
 tools/gen_swagger.py  generator for the V3 connectors (from a curated op table)
 tools/live-test.ps1   live smoke test (List/Get/Create) + evidence capture
+docs/deploy-sdp-wsl2.md  deploy/redeploy a disposable SDP 14990 in WSL2 for write-testing
 docs/adr/             architecture decision records
 docs/test-evidence/   committed live request/response captures
 CHECKPOINT.md         build state — done / in progress / exact next step
