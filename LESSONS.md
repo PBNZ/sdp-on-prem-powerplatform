@@ -12,8 +12,11 @@ The original `AcceptHeader` (`required: false` + default + internal) validated c
 made the portal wizard refuse to save ("Unable to save. 1 error(s) in swagger"), flagging the
 AcceptHeader reference; flipping *Is required* to Yes in the wizard turned every action green.
 Worse than the save error: with `required: false` the runtime **silently drops** the header, so
-`Accept: application/vnd.manageengine.sdp.v3+json` would never reach SDP. Import-by-URL fails on
-the same validation (the raw.githubusercontent URLs themselves are fine — 200, well under 1 MB).
+`Accept: application/vnd.manageengine.sdp.v3+json` would never reach SDP. (The import-by-URL
+failure seen the same day was a separate, mundane cause: a `github.com/…/blob/…` page URL was
+pasted instead of the raw URL — the portal downloads HTML and reports *"We weren't able to
+download the OpenAPI file"*. The raw.githubusercontent URLs themselves are fine — 200, well
+under 1 MB — and the README now warns about the blob-URL trap.)
 `tools/check_pp_rules.py` (wired into `validate.yml`) now enforces both directions of the rule
 offline: internal+default ⇒ required, and internal+required ⇒ default.
 

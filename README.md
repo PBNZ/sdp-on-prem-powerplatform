@@ -50,6 +50,9 @@ a mechanical conversion of the official Postman collection (which is ~9 MB, over
    - `https://raw.githubusercontent.com/PBNZ/sdp-on-prem-powerplatform/main/connectors/sdp-assets-cmdb-v3/apiDefinition.swagger.json`
    - `https://raw.githubusercontent.com/PBNZ/sdp-on-prem-powerplatform/main/connectors/sdp-cmdb-v1/apiDefinition.swagger.json`
    - `https://raw.githubusercontent.com/PBNZ/sdp-on-prem-powerplatform/main/connectors/sdp-query/apiDefinition.swagger.json`
+
+   Use these `raw.githubusercontent.com` URLs exactly — the `github.com/…/blob/…` page URL
+   serves HTML, and the portal fails with *"We weren't able to download the OpenAPI file"*.
 3. **Set the host.** Edit the connector's **Host** from the placeholder `sdp.example.com` to your
    SDP server (e.g. `servicedesk.company.com`). **HTTPS only.**
 4. **Create a connection.** Paste the API key when prompted — it is stored as a **secured**
