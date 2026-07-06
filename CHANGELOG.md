@@ -31,6 +31,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Each connector's description now ends with its own raw import-by-URL, so an imported
+  connector self-documents where its definition lives.
 - Git history rewritten before publication to scrub a truncated demo-key prefix from an old
   doc example (ADR-0002) — all pre-publication commit SHAs changed.
 

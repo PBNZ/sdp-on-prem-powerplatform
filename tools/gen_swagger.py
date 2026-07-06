@@ -19,6 +19,8 @@ import json
 import os
 
 ACCEPT = "application/vnd.manageengine.sdp.v3+json"
+RAW_URL = ("https://raw.githubusercontent.com/PBNZ/sdp-on-prem-powerplatform"
+           "/main/connectors/{}/apiDefinition.swagger.json")
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 
@@ -573,6 +575,7 @@ def main():
         out_dir = os.path.join(ROOT, "connectors", name)
         os.makedirs(out_dir, exist_ok=True)
         doc = fn()
+        doc["info"]["description"] += " Definition (import-by-URL): " + RAW_URL.format(name)
         n_ops = sum(len(m) for m in doc["paths"].values())
         path = os.path.join(out_dir, "apiDefinition.swagger.json")
         with open(path, "w", encoding="utf-8", newline="\n") as f:

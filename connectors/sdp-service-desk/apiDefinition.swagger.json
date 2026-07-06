@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "SDP - Service Desk",
-    "description": "Work with ManageEngine ServiceDesk Plus On-Premises requests, changes, problems, solutions, notes, worklogs, tasks, and resolutions, plus admin lookups for dropdowns. Auth: technician API key in the 'authtoken' header. Every parameter is wrapped in a single 'input_data' JSON envelope per the SDP V3 API contract.",
+    "description": "Work with ManageEngine ServiceDesk Plus On-Premises requests, changes, problems, solutions, notes, worklogs, tasks, and resolutions, plus admin lookups for dropdowns. Auth: technician API key in the 'authtoken' header. Every parameter is wrapped in a single 'input_data' JSON envelope per the SDP V3 API contract. Definition (import-by-URL): https://raw.githubusercontent.com/PBNZ/sdp-on-prem-powerplatform/main/connectors/sdp-service-desk/apiDefinition.swagger.json",
     "version": "0.2.0",
     "contact": {
       "name": "Peter Braun",

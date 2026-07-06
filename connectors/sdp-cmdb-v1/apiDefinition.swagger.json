@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "SDP - CMDB (v1 legacy)",
-    "description": "Legacy XML CMDB API for ManageEngine ServiceDesk Plus On-Premises builds below 15100 (where the CMDB v3 JSON API is unavailable). Lists/counts configuration items and reads/writes CI relationships. Auth: the technician key as the 'TECHNICIAN_KEY' query parameter (same secret value as the V3 'authtoken'). Write payloads are XML supplied in the 'INPUT_DATA' form field. Responses are JSON with the envelope { API: { response: { operation: { result, Details } } } }; success is result.statuscode 200.",
+    "description": "Legacy XML CMDB API for ManageEngine ServiceDesk Plus On-Premises builds below 15100 (where the CMDB v3 JSON API is unavailable). Lists/counts configuration items and reads/writes CI relationships. Auth: the technician key as the 'TECHNICIAN_KEY' query parameter (same secret value as the V3 'authtoken'). Write payloads are XML supplied in the 'INPUT_DATA' form field. Responses are JSON with the envelope { API: { response: { operation: { result, Details } } } }; success is result.statuscode 200. Definition (import-by-URL): https://raw.githubusercontent.com/PBNZ/sdp-on-prem-powerplatform/main/connectors/sdp-cmdb-v1/apiDefinition.swagger.json",
     "version": "0.1.0",
     "contact": {
       "name": "Peter Braun",
