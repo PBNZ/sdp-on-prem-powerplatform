@@ -22,9 +22,10 @@ it meets the bar one would normally want for a public project.
   CODE_OF_CONDUCT.md, contributor-facing CONTRIBUTING.md, issue/PR templates, and a
   definition-validation CI workflow (swagger-cli + generator-sync check). CONTRIBUTING sets
   the expectation that reviews may be slow.
-- **Rewrite git history before the flip.** Old commits contained a truncated prefix of the
-  public demo instance's API key (`<your-api-key>`) in a doc example. It is not a usable
-  credential, but the policy is zero key material — even truncated — in a public history.
+- **Rewrite git history before the flip.** Old commits contained an 8-character truncated
+  prefix of the public demo instance's API key in a doc example (deliberately not quoted here
+  — the policy applies to this file too). It is not a usable credential, but the policy is
+  zero key material — even truncated — in a public history.
   `git filter-repo` scrubs the blob text and the one commit message that quoted it;
   pre-publication SHAs change. Only the author had clones, so nothing breaks.
 - **The visibility flip itself is manual** (the maintainer runs it), not part of any automated
