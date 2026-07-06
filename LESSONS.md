@@ -87,13 +87,29 @@ table's name), then *plaintext* (inference from the `citext` type, untested). Bo
 insert-then-authenticate test settled it — **encrypted + cached**. Lesson: test the actual auth path,
 don't infer key storage from a column type.
 
-**The headless path that works:** mint through the app with a **scripted admin session**. A fresh
-install accepts default `administrator`/`administrator` (verified), so a script logs in
-(`SDPSESSIONID` + `sdplogincsrfparam` + `AUTHRULE_NAME=RememberMeLoginModule` → POST
-`/j_security_check`) and calls SDP's integration-key generation endpoint; the app encrypts + caches
-the new key correctly and returns the GUID. That is how to self-provision a key on every rebuild
-without a browser. (Alternative, untested: preserve the keystore + restore the existing key row
-across rebuilds so the *same* GUID keeps working — hinges on the ciphertext being keystore-portable.)
+**The headless path that works (PROVEN 2026-07-07):** mint through the app with a **scripted admin
+session** — every step is plain `curl` + `openssl`, no browser:
+1. GET `/` → capture cookie `SDPSESSIONID`, hidden field `sdplogincsrfparam`, and the RSA public key
+   (the 3rd arg of `checkForNullInLogin(this, this.form, '<BASE64_SPKI>')` in the login HTML).
+2. RSA-OAEP(SHA-256) encrypt the password with that key: `openssl pkeyutl -encrypt -pubin -inkey
+   pub.pem -pkeyopt rsa_padding_mode:oaep -pkeyopt rsa_oaep_md:sha256 -pkeyopt rsa_mgf1_md:sha256 |
+   openssl base64 -A` (mirrors `encryptPassword()` in `/webapps/ROOT/scripts/Login.js`).
+3. POST `/j_security_check` (same cookie jar): `j_username`, `j_password=<b64 ciphertext>`,
+   `AUTHRULE_NAME=RememberMeLoginModule`, `sdplogincsrfparam`, `logonDomainName=-1` → authenticated
+   session + cookie `sdpcsrfcookie`.
+4. POST `/api/v3/integration_keys` (cookies + double-submit CSRF `sdpcsrfparam=<sdpcsrfcookie>`),
+   `input_data={"integration_key":{"name":...,"validity":{"value":0},"roles":[{"id":3,"name":"SDAdmin"}],"status":"active"}}`
+   → response `integration_key.key` is the new GUID (returned **once**, at creation; the list API
+   only ever returns the encrypted hex form). Send NO `technician_id` — the owner is the
+   authenticated user. Verified live: 201 + the returned GUID authenticates `GET /api/v3/requests`
+   → 200 (proving the app did its own encryption + in-memory cache-insert, the thing a raw DB
+   INSERT can't).
+
+Gotchas: several wrong-password attempts trip an ADS **captcha lockout** on the admin account
+(clears on time / a successful browser login / a restart) — get the RSA step right the first time.
+SDAdmin role id = **3**; admin is `userId 5`. Build **15290** may gate requests behind a newer
+`/zwaf/encryption/handshake` transport — re-verify `encryptPassword()` in `Login.js` and whether the
+plain login flow still works there. This recipe is the core of the planned `sdp-on-prem-test-harness`.
 
 ## Some SDP GET endpoints reject input_data entirely
 
