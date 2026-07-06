@@ -1,0 +1,51 @@
+name: validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  definitions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # swagger-cli is unmaintained upstream but remains the reliable offline
+      # Swagger 2.0 validator (see LESSONS.md); pinned at major version 4.
+      - name: Validate Swagger 2.0 definitions
+        run: |
+          for f in connectors/*/apiDefinition.swagger.json; do
+            echo "== $f"
+            npx --yes @apidevtools/swagger-cli@4 validate "$f"
+          done
+
+      - name: Enforce Power Platform 1 MB import cap
+        run: |
+          for f in connectors/*/apiDefinition.swagger.json; do
+            size=$(stat -c%s "$f")
+            echo "== $f ($size bytes)"
+            [ "$size" -lt 1048576 ] || { echo "$f exceeds the 1 MB import cap"; exit 1; }
+          done
+
+      - name: apiProperties.json parse + secured-key sanity
+        run: |
+          for f in connectors/*/apiProperties.json; do
+            echo "== $f"
+            python3 - "$f" <<'PY'
+          import json, sys
+          d = json.load(open(sys.argv[1]))
+          params = d["properties"]["connectionParameters"]
+          bad = [k for k, v in params.items() if v.get("type") != "securestring"]
+          assert not bad, f"non-securestring connection parameter(s): {bad}"
+          PY
+          done
+
+      - name: Generator sync (committed JSON matches generator output)
+        run: |
+          python3 tools/gen_swagger.py
+          git diff --exit-code connectors/
