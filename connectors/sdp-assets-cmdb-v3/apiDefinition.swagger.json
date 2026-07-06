@@ -550,7 +550,7 @@
       "name": "Accept",
       "in": "header",
       "type": "string",
-      "required": false,
+      "required": true,
       "default": "application/vnd.manageengine.sdp.v3+json",
       "x-ms-summary": "Accept",
       "x-ms-visibility": "internal",

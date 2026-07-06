@@ -24,6 +24,11 @@ jobs:
             npx --yes @apidevtools/swagger-cli@4 validate "$f"
           done
 
+      # swagger-cli doesn't know Power Platform's x-ms-* rules; the portal
+      # wizard enforces them at save time (see LESSONS.md).
+      - name: Power Platform x-ms rules
+        run: python3 tools/check_pp_rules.py
+
       - name: Enforce Power Platform 1 MB import cap
         run: |
           for f in connectors/*/apiDefinition.swagger.json; do

@@ -3,6 +3,20 @@
 > One lesson per section, one-line summary first. Update rather than duplicate; delete what
 > turns out wrong.
 
+## Internal parameters with a default must be `required: true` — swagger-cli won't tell you
+
+The Power Platform portal enforces x-ms rules that generic Swagger 2.0 validators pass silently:
+a parameter with `x-ms-visibility: internal` **and** a `default` must be `required`
+(Swagger Validator rule *PropertyMustBeRequired*: "Optional internal fields are ignored").
+The original `AcceptHeader` (`required: false` + default + internal) validated clean in CI but
+made the portal wizard refuse to save ("Unable to save. 1 error(s) in swagger"), flagging the
+AcceptHeader reference; flipping *Is required* to Yes in the wizard turned every action green.
+Worse than the save error: with `required: false` the runtime **silently drops** the header, so
+`Accept: application/vnd.manageengine.sdp.v3+json` would never reach SDP. Import-by-URL fails on
+the same validation (the raw.githubusercontent URLs themselves are fine — 200, well under 1 MB).
+`tools/check_pp_rules.py` (wired into `validate.yml`) now enforces both directions of the rule
+offline: internal+default ⇒ required, and internal+required ⇒ default.
+
 ## RepoKit power-platform-connectors type assumes Postman generation
 
 The type template stamps a Postman→Swagger generation pipeline. This project hand-authors

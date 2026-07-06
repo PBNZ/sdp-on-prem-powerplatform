@@ -26,7 +26,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   import the definitions by URL) plus the four raw import URLs.
 - Initial scaffold via RepoKit.
 
+- `tools/check_pp_rules.py` + CI step — enforces the Power Platform x-ms rules that
+  swagger-cli can't (internal + default ⇒ required, internal + required ⇒ default).
+
 ### Changed
 
 - Git history rewritten before publication to scrub a truncated demo-key prefix from an old
   doc example (ADR-0002) — all pre-publication commit SHAs changed.
+
+### Fixed
+
+- V3 connectors' `Accept` header is now `required: true` — with `required: false` the portal
+  wizard refused to save (Swagger Validator rule *PropertyMustBeRequired*: internal parameter
+  with a default must be required) and the header would have been silently dropped at runtime.
+  This unblocks both file import and import-by-URL for `sdp-service-desk`,
+  `sdp-assets-cmdb-v3`, and `sdp-query`.

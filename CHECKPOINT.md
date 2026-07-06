@@ -32,6 +32,11 @@
   (ADR-0002).
 - **Repo is PUBLIC (2026-07-06).** Peter had the visibility flipped + About/topics set; verified:
   visibility PUBLIC, Apache-2.0 detected, raw definition URL serves HTTP 200, validate CI green.
+- **First real portal import (2026-07-06) surfaced + fixed an x-ms blocker:** the internal
+  `Accept` header had `required: false`, which the portal wizard rejects at save
+  (*PropertyMustBeRequired*) and the runtime would silently drop. Fixed in the generator
+  (all three V3 connectors regenerated); `tools/check_pp_rules.py` added to CI so
+  swagger-cli's blind spot is covered offline. See LESSONS.md.
 
 ## In progress
 

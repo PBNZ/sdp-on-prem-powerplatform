@@ -164,7 +164,7 @@ def build(title, description, base_path, ops, definitions):
         "paths": paths,
         "parameters": {
             "AcceptHeader": {
-                "name": "Accept", "in": "header", "type": "string", "required": False,
+                "name": "Accept", "in": "header", "type": "string", "required": True,
                 "default": ACCEPT, "x-ms-summary": "Accept", "x-ms-visibility": "internal",
                 "description": "SDP V3 media type; leave the default.",
             }
