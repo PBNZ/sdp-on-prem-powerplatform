@@ -30,11 +30,12 @@
   LICENSE, SECURITY / CODE_OF_CONDUCT / contributor-facing CONTRIBUTING, issue+PR templates,
   definition-validation CI, and a history rewrite dropping a truncated demo-key prefix
   (ADR-0002).
+- **Repo is PUBLIC (2026-07-06).** Peter had the visibility flipped + About/topics set; verified:
+  visibility PUBLIC, Apache-2.0 detected, raw definition URL serves HTTP 200, validate CI green.
 
 ## In progress
 
-- Going public: prep is committed; the **visibility flip + About text are Peter's manual step**
-  (exact `gh` commands in the "Exact next step" below).
+- Nothing — next work is the live write verification below.
 
 ## Known gap (see LESSONS.md)
 
@@ -48,15 +49,14 @@
 
 ## Exact next step
 
-v1 build complete (Phases 0–3); publish prep done (ADR-0002). Remaining (needs Peter / a tenant):
-1. **Flip the repo public** (after reviewing the rewritten history) — set the About description
-   + topics and change visibility with `gh repo edit` (exact commands in the session handover),
-   then sanity-check one raw definition URL in a browser.
-2. Live **write** verification (create/update/close/delete, CI writes, relationship writes) on a
+v1 build complete (Phases 0–3); published as a public personal alpha (ADR-0002). Remaining
+(needs Peter / a tenant):
+1. Live **write** verification (create/update/close/delete, CI writes, relationship writes) on a
    disposable instance once a valid technician key exists — run
    `tools/live-test.ps1 -HostName <host> -ApiKey <key> -IncludeCreate -SkipCertCheck`.
-3. Optional: import one connector into a real Power Platform tenant and run one action end-to-end.
-4. Optional enhancements: friendly typed params for top actions; dynamic-host policy; Microsoft
+2. Optional: import one connector into a real Power Platform tenant (by raw URL — see README) and
+   run one action end-to-end.
+3. Optional enhancements: friendly typed params for top actions; dynamic-host policy; Microsoft
    certification.
 
 ## Phase map (per the PRD — a private planning doc, §6)
