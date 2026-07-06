@@ -128,15 +128,18 @@ curl -sk https://localhost:8080/api/v3/requests \
 
 The `4000/401 "AuthToken ... invalid"` envelope is the **success** signal here: it proves the V3
 path, the `authtoken` header, and the `input_data` shape are accepted by a real on-prem build — it
-just wants a valid key. (Note: this local 14990 build returns `response_status` as an **object**;
-the public demo returns it as an **array** — connector schemas leave it untyped for that reason.)
+just wants a valid key. (Note: this error envelope returns `response_status` as an **object**,
+while list successes return an **array** — the shape tracks the response kind, not the build; see
+LESSONS.md. Connector schemas leave it untyped for that reason.)
 
 ---
 
 ## Mint a technician API key (unblocks live write-testing)
 
-The key column is AES-encrypted with SDP's install-time key, so you can't `INSERT` one — you must
-let the app generate it. On the fresh install:
+The key is **encrypted at rest** — `integrationkeydefinition.integrationkey` is a keystore-encrypted
+`schar` column, and auth is served from an in-memory cache — so a direct DB `INSERT` **won't** work
+(a plaintext row returns `401 AuthToken invalid`, verified). Generate it through the app. On the
+fresh install:
 
 1. Browse to **https://localhost:8080** (accept the self-signed cert) and log in
    `administrator` / `administrator`.

@@ -1,0 +1,9 @@
+# listrequests — local WSL2 SDP 14990 (fresh install, empty DB), 2026-07-06
+# Proves a freshly minted technician API key authenticates on the local on-prem build
+# (200/2000 vs the 401 auth envelope without a key); zero rows because the DB is empty.
+# response_status is an ARRAY here (list success) — same as the demo; see LESSONS.md.
+## Request
+GET https://localhost:8080/api/v3/requests?input_data=%7B%22list_info%22%3A%7B%22row_count%22%3A2%2C%22start_index%22%3A1%2C%22get_total_count%22%3Atrue%7D%7D
+
+## Response (HTTP 200)
+{"response_status":[{"status_code":2000,"status":"success"}],"list_info":{"has_more_rows":false,"start_index":1,"total_count":0,"page":1,"get_total_count":"true","row_count":0},"requests":[]}

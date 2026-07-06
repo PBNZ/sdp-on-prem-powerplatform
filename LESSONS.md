@@ -11,14 +11,17 @@ scaffold time (ADR-0001). An upstream issue for pbnz/repo-kit is drafted but not
 filing to an external repo was blocked by the write-safety classifier in autonomous mode; Peter
 can post it (draft text in ADR-0001 / this file's history).
 
-## response_status is an array on the demo but an object on local 14990
+## response_status shape tracks the response kind (list → array, single/error → object), not the build
 
-Verified live both ways: `https://demo.servicedeskplus.com` returns
-`response_status: [{status_code:2000,...}]` (array); a local build-14990 instance returns
-`response_status: {status_code:...}` (object). The PRD flagged this as build-dependent — now
-confirmed on two real builds. Connector response schemas therefore leave `response_status`
-untyped, and any consumer/policy must handle both shapes (the sibling MCP client already does:
-`Array.isArray(rawStatus) ? rawStatus[0] : rawStatus`).
+Earlier versions of this lesson claimed the shape was build-dependent (demo = array, local 14990
+= object). The repo's own captures refute that: the demo returns **both** shapes — an array on a
+list success (`docs/test-evidence/listrequests.txt`) and an object on single-resource GETs
+(`getrequest.txt`, `requests/{id}/resolutions` in `phase1-reads.txt`) — and local 14990 likewise
+returns an array on a list success (`listrequests-local14990.txt`) and an object on the
+auth-error envelope. Every capture so far fits: list responses → array of status objects;
+single-resource and error responses → one status object. Connector response schemas leave
+`response_status` untyped, and any consumer/policy must handle both shapes (the companion MCP
+project's client already does: `Array.isArray(rawStatus) ? rawStatus[0] : rawStatus`).
 
 ## SDP trial expires (~30 days) → redeploy to reset it; fresh install fixes the admin-login blocker
 
@@ -35,14 +38,45 @@ The earlier write-test blocker was two-fold, and **both are resolved by a fresh 
   "Generate API Key" path was unavailable. **On the fresh install the default admin login works**
   (verified 2026-07-06: `SDPSESSIONID` session cookie, hidden CSRF field `sdplogincsrfparam`,
   `AUTHRULE_NAME=RememberMeLoginModule`, POST `/j_security_check` → authenticated home page).
-- The `techniciankeydefinition.techniciankey` column is still `bytea` AES-encrypted with SDP's
-  install-time key, so you can't `INSERT` a key — you must let the app generate it (now possible
-  via the working admin login).
+- The API key is **not** in `techniciankeydefinition` (that AES-`bytea` table is legacy and empty).
+  The real store is `integrationkeydefinition.integrationkey`, but it's **encrypted at rest**
+  (keystore-keyed `schar` column) and auth is cached in memory — so you **can't** mint one with a DB
+  `INSERT`. See the dedicated lesson below; mint via the app (a scripted admin session works
+  headlessly on a fresh install).
 
 Net: reads are fully verified live (demo, 2xx); the create/write path is authored + structurally
 validated, its live 2xx now **only needs the key generated in the browser** (Admin → Technicians →
 Generate API Key) then `tools/live-test.ps1 -HostName localhost:8080 -ApiKey <key> -IncludeCreate
 -SkipCertCheck`. Full deploy/redeploy procedure: `docs/deploy-sdp-wsl2.md`.
+
+## SDP API keys: encrypted at rest + cached in memory → mint via the app, not a DB INSERT
+
+Settled by a live insert-then-authenticate test on the fresh 14990 instance. The value you send as
+the `authtoken` header is a **36-char GUID**; the DB column `integrationkeydefinition.integrationkey`
+(a `citext` **`schar` secure column**) stores only a **reversibly-encrypted 68-byte ciphertext** of
+it, keyed to the on-disk keystores (`conf/sdp.keystore`, `conf/manageengine.keystore`,
+`conf/key_modifier.conf`, `adssecretkeys`). The plaintext GUID is **nowhere** in the DB.
+
+Two independent facts kill 'just INSERT a key', both verified live:
+1. **Encrypted at rest.** Inserting a plaintext GUID into `integrationkey` → the API returns
+   `401 AuthToken invalid` (the app decrypts the column and gets garbage), while the real key still
+   returns 200. You can't compute the correct ciphertext without SDP's keystore-keyed encryption.
+2. **In-memory cache.** Auth is served from an in-memory cache (`INTEGRATION_KEY_DO`), not a
+   per-request DB read — 16 auth calls produced zero scans on the table. Even a correctly-encrypted
+   row wouldn't be seen until a cache reload/restart.
+
+Own the trail: this note first claimed AES-`bytea`/un-INSERTable (inference from a legacy *empty*
+table's name), then *plaintext* (inference from the `citext` type, untested). Both wrong. Only the
+insert-then-authenticate test settled it — **encrypted + cached**. Lesson: test the actual auth path,
+don't infer key storage from a column type.
+
+**The headless path that works:** mint through the app with a **scripted admin session**. A fresh
+install accepts default `administrator`/`administrator` (verified), so a script logs in
+(`SDPSESSIONID` + `sdplogincsrfparam` + `AUTHRULE_NAME=RememberMeLoginModule` → POST
+`/j_security_check`) and calls SDP's integration-key generation endpoint; the app encrypts + caches
+the new key correctly and returns the GUID. That is how to self-provision a key on every rebuild
+without a browser. (Alternative, untested: preserve the keystore + restore the existing key row
+across rebuilds so the *same* GUID keeps working — hinges on the ciphertext being keystore-portable.)
 
 ## Some SDP GET endpoints reject input_data entirely
 
