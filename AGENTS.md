@@ -4,7 +4,7 @@ Microsoft Power Platform custom connectors (hand-authored OpenAPI 2.0) for Manag
 ServiceDesk Plus On-Premises — Service Desk modules, CMDB (v3 + legacy v1), and the Execute
 Query report API.
 
-Type: `power-platform-connectors` · Tier: Core
+Type: `power-platform-connectors` · Tier: Core + Public
 
 This repo follows the **RepoKit** standard. For the conventions and the pre-commit / pre-PR
 checklists, use the `repo-standard` skill (RepoKit: `/plugin marketplace add PBNZ/repo-kit`).
@@ -27,7 +27,8 @@ checklists, use the `repo-standard` skill (RepoKit: `/plugin marketplace add PBN
 - `AGENTS.md` is the canonical agent file; `CLAUDE.md` is a thin `@AGENTS.md` import (Claude Code
   reads `CLAUDE.md`, not `AGENTS.md`).
 - Conventional Commits; one concern per PR. Record notable decisions as ADRs in `docs/adr/`.
-- Ceremony scales by visibility — this repo is at the **Core** tier.
+- Ceremony scales by visibility — this repo is at the **Core + Public** tier (published as a
+  clearly-flagged personal alpha; see ADR-0002).
 - Connector definitions are **hand-authored OpenAPI 2.0** (see ADR-0001) — never regenerate them
   from the Postman collection, and never commit an API key into a definition file.
 - The public demo (`demo.servicedeskplus.com`) is **read-only** — never create/update/delete

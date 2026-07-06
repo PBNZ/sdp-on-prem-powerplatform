@@ -26,10 +26,15 @@
   - `templates/` — 8 SQL templates (build 14990), **each verified to run live** (2000).
 - **Top-level README** written (install, host, key + scoping, gateway choice, build caveats,
   Execute-Query usage + schema-fragility warning) — acceptance criterion #6.
+- **Publish prep (2026-07-06):** public-alpha README warning + raw import URLs, Apache-2.0
+  LICENSE, SECURITY / CODE_OF_CONDUCT / contributor-facing CONTRIBUTING, issue+PR templates,
+  definition-validation CI, and a history rewrite dropping a truncated demo-key prefix
+  (ADR-0002).
 
 ## In progress
 
-- Final acceptance sweep: full-repo fresh-context verifier + placeholder/host consistency check.
+- Going public: prep is committed; the **visibility flip + About text are Peter's manual step**
+  (exact `gh` commands in the "Exact next step" below).
 
 ## Known gap (see LESSONS.md)
 
@@ -43,15 +48,18 @@
 
 ## Exact next step
 
-v1 build complete (Phases 0–3). Remaining before publish (needs Peter / a tenant):
-1. Live **write** verification (create/update/close/delete, CI writes, relationship writes) on a
+v1 build complete (Phases 0–3); publish prep done (ADR-0002). Remaining (needs Peter / a tenant):
+1. **Flip the repo public** (after reviewing the rewritten history) — set the About description
+   + topics and change visibility with `gh repo edit` (exact commands in the session handover),
+   then sanity-check one raw definition URL in a browser.
+2. Live **write** verification (create/update/close/delete, CI writes, relationship writes) on a
    disposable instance once a valid technician key exists — run
    `tools/live-test.ps1 -HostName <host> -ApiKey <key> -IncludeCreate -SkipCertCheck`.
-2. Optional: import one connector into a real Power Platform tenant and run one action end-to-end.
-3. Optional enhancements: friendly typed params for top actions; dynamic-host policy; Microsoft
+3. Optional: import one connector into a real Power Platform tenant and run one action end-to-end.
+4. Optional enhancements: friendly typed params for top actions; dynamic-host policy; Microsoft
    certification.
 
-## Phase map (PRD §6)
+## Phase map (per the PRD — a private planning doc, §6)
 
 - [x] Phase 0 — walking skeleton (3 request ops; reads proven live, create authored + pending key)
 - [x] Phase 1 — full Service Desk connector + admin lookups (37 ops, reads live, verified 9/9)
