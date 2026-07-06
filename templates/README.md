@@ -26,7 +26,7 @@ These queries use the physical table/column names of **SDP build 14990** (Postgr
 internal/`4004` error after an upgrade:
 
 1. Confirm the table/column names for your build (regenerate the schema map with
-   `pg_dump --schema-only`; see the sibling project's `RUNBOOK.md`).
+   `pg_dump --schema-only` against your instance's Postgres).
 2. `information_schema` is blocked via the API — to peek at a table's columns, run
    `SELECT * FROM <table> LIMIT 0` and read the result's column headers.
 

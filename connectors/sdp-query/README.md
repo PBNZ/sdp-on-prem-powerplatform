@@ -51,7 +51,7 @@ starter library keyed to **build 14990**, each template verified to run live:
 
 **After an SDP upgrade, physical names can change** — keep your SQL in flow variables / these
 template files, not hard-baked, so an admin can fix a query without republishing. Regenerate the
-schema map for a new build with `pg_dump --schema-only` (see the sibling project's `RUNBOOK.md`).
+schema map for a new build with `pg_dump --schema-only` against your instance's Postgres.
 
 ## Security note
 

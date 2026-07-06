@@ -6,8 +6,8 @@ public demo. Battle-tested end-to-end on **2026-07-06** (a full redeploy).
 
 > This is the *operational* guide — start, stop, verify, redeploy, mint a key. For the deep
 > installer internals (what the `.bin` is, InstallAnywhere, symlink placeholders, the `expect`
-> script design), see the sibling MCP-Server project's `sdp-14990-schema/RUNBOOK.md`
-> (reference-only; do not edit it).
+> script design), see the companion MCP-Server project's `sdp-14990-schema/RUNBOOK.md`
+> (a private repo of the author's — not published; reference-only, do not edit it).
 
 ---
 
@@ -178,7 +178,7 @@ Or stop the whole distro from Windows:
 
 ## Gotchas (verified)
 
-- **HTTPS only on :8080.** The sibling RUNBOOK's `http://localhost:8080` is wrong for this build —
+- **HTTPS only on :8080.** The companion RUNBOOK's `http://localhost:8080` is wrong for this build —
   plain HTTP returns HTTP 400 *"This combination of host and port requires TLS"*. Use `https://`
   and `curl -k` / accept the self-signed cert.
 - **Never install on `/mnt/c/*`.** Postgres WAL `fsync` is unreliable over 9P/virtiofs. Install

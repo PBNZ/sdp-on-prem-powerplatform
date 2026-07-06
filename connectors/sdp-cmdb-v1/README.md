@@ -30,8 +30,8 @@ tightly.
 | Modify CI relationships | POST | `/cmdb/cirelationships` | Add or delete via the XML `INPUT_DATA` payload. |
 
 **Verification note:** *List/Count all CIs* were verified live (HTTP 200, `statuscode` 200) on the
-public demo. The **relationship** operations are modeled from the working V1 client
-(`cmdb-v1-client.ts` / `cmdb-relationships.ts` in the sibling MCP project) and the official
+public demo. The **relationship** operations are modeled from a working V1 client (in a
+companion project of the author's — private, not published) and the official
 CMDB v1↔v3 comparison; on the 15100+ demo the V1 relationship endpoint is superseded by V3, so
 verify them on an actual sub-15100 instance.
 

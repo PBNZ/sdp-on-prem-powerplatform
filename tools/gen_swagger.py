@@ -4,8 +4,8 @@ Generate the SDP Power Platform connector Swagger 2.0 definitions from a
 curated, hand-written operation spec.
 
 This is NOT a mechanical Postman conversion (see ADR-0001). The operation
-tables below are hand-authored from live-verified SDP behaviour and the sibling
-MCP project's endpoint inventory. The generator only removes repetition: every
+tables below are hand-authored from live-verified SDP behaviour and a companion
+(private) MCP project's endpoint inventory. The generator only removes repetition: every
 SDP list/get/create/update op shares the same input_data envelope, authtoken
 header, and response shape, so we describe each op in a few lines and let the
 generator stamp the boilerplate identically. Review the generated JSON — it is

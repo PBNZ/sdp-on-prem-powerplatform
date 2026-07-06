@@ -1,5 +1,21 @@
 # sdp-on-prem-powerplatform
 
+> [!WARNING]
+> **Vibe-coded personal alpha — use with utmost caution.**
+>
+> This project was built AI-assisted ("vibe coded") for **personal use** and is in **alpha
+> testing**. It is public for one reason only: Power Platform can create a custom connector
+> from a definition URL, and that URL must be publicly reachable — publishing the raw files
+> beats re-uploading them on every test round. **Public does not mean production-ready:**
+>
+> - **Write operations (create/update/close/delete) have not been live-verified yet** — only
+>   the read operations have (see [Verification status](#verification-status)).
+> - Expect breaking changes without notice. No support, no warranty (see [LICENSE](LICENSE)).
+> - Review any definition before importing it, point it only at instances you are allowed to
+>   test against, and use a **least-privilege API key** — never an admin key you care about.
+>
+> Not affiliated with, or endorsed by, ManageEngine / Zoho or Microsoft.
+
 Microsoft **Power Platform custom connectors** for **ManageEngine ServiceDesk Plus On-Premises**
 — hand-authored, lean **OpenAPI 2.0 (Swagger 2.0)** definitions covering the core Service Desk
 modules, the CMDB API (v3 and legacy v1), and the Execute Query report API. Import a connector
@@ -27,8 +43,13 @@ a mechanical conversion of the official Postman collection (which is ~9 MB, over
 1. **Generate an API key in SDP.** *Admin → Technicians*, edit a technician (ideally a
    least-privilege integration account), **Generate API Key**, set a validity, copy it.
    - For `sdp-query`, that technician also needs the **Create Query Report** permission.
-2. **Import.** Power Automate / Apps → *Custom connectors → New custom connector → Import an
-   OpenAPI file* → pick a connector's `apiDefinition.swagger.json`.
+2. **Import.** Power Automate / Apps → *Custom connectors → New custom connector*, then either
+   **Import an OpenAPI file** (a downloaded `apiDefinition.swagger.json`) or import from URL
+   with the raw URL of the connector you want:
+   - `https://raw.githubusercontent.com/PBNZ/sdp-on-prem-powerplatform/main/connectors/sdp-service-desk/apiDefinition.swagger.json`
+   - `https://raw.githubusercontent.com/PBNZ/sdp-on-prem-powerplatform/main/connectors/sdp-assets-cmdb-v3/apiDefinition.swagger.json`
+   - `https://raw.githubusercontent.com/PBNZ/sdp-on-prem-powerplatform/main/connectors/sdp-cmdb-v1/apiDefinition.swagger.json`
+   - `https://raw.githubusercontent.com/PBNZ/sdp-on-prem-powerplatform/main/connectors/sdp-query/apiDefinition.swagger.json`
 3. **Set the host.** Edit the connector's **Host** from the placeholder `sdp.example.com` to your
    SDP server (e.g. `servicedesk.company.com`). **HTTPS only.**
 4. **Create a connection.** Paste the API key when prompted — it is stored as a **secured**
@@ -53,9 +74,9 @@ a mechanical conversion of the official Postman collection (which is ~9 MB, over
 - **Pagination** (V3): `list_info` — `row_count` (max 100), `start_index`, `has_more_rows`,
   `get_total_count`, plus `search_criteria` and `sort_field`/`sort_order`.
 - **Responses** (V3): `{ response_status, <module>: ..., list_info }`; success is
-  `response_status.status_code` **2000**. `response_status` is an **array** on some builds and an
-  **object** on others (the demo returns an array; a local build-14990 returns an object) — the
-  response schemas leave it untyped so consumers handle both.
+  `response_status.status_code` **2000**. `response_status` is an **array** on list responses
+  and an **object** on single-resource and error responses in every capture so far — the
+  response schemas leave it untyped so consumers handle both shapes.
 
 ## Build-version caveats
 
@@ -73,7 +94,7 @@ The `sdp-query` connector runs one read-only SQL `SELECT` (JOINs, custom fields,
 replace many REST GETs. Physical table/column names are **build-specific**; the [`templates/`](templates/)
 library is keyed to **build 14990** and every template was verified to run live. After an SDP
 upgrade, names can change — keep SQL in editable flow variables / template files, not hard-baked,
-and regenerate the schema map with `pg_dump --schema-only` (see the sibling project's `RUNBOOK.md`).
+and regenerate the schema map with `pg_dump --schema-only` against your instance's Postgres.
 
 ## Verification status
 
@@ -83,10 +104,11 @@ and regenerate the schema map with `pg_dump --schema-only` (see the sibling proj
 - **Execute Query:** SELECT returns rows; `UPDATE`/`information_schema`/`GET` are rejected — all
   verified live.
 - **Writes** (create/update/delete/close, CI writes, relationship writes): authored and
-  structurally verified (valid Swagger 2.0, fresh-context reviewed), but a live write **2xx is
-  pending running the smoke test with a technician API key on a disposable instance**. A fresh
-  WSL2 SDP 14990 is stood up for exactly this — see [`docs/deploy-sdp-wsl2.md`](docs/deploy-sdp-wsl2.md)
-  to mint a key and run `tools/live-test.ps1 -IncludeCreate`. Never write to the shared demo.
+  structurally verified (valid Swagger 2.0, fresh-context reviewed), but **not yet verified
+  live** — a write 2xx is pending running the smoke test with a technician API key on a
+  disposable instance (see [`docs/deploy-sdp-wsl2.md`](docs/deploy-sdp-wsl2.md) and
+  `tools/live-test.ps1 -IncludeCreate`). **This is the main reason for the alpha warning
+  above.** Never write to the shared demo.
 - Each connector was reviewed by a fresh-context verifier subagent against the Power Platform
   rules and the SDP API contract.
 
@@ -104,6 +126,17 @@ CHECKPOINT.md         build state — done / in progress / exact next step
 LESSONS.md            non-obvious findings
 ```
 
+Some docs reference a *companion MCP project* — that repo is private and not published; the
+references are kept for the author's own cross-navigation.
+
 See [`AGENTS.md`](AGENTS.md) for the START-HERE map. Follows the
-[RepoKit](https://github.com/PBNZ/repo-kit) standard. Private for now; to be published once
-tested in a real Power Platform tenant.
+[RepoKit](https://github.com/PBNZ/repo-kit) standard at the Public tier.
+
+## Status, license, trademarks
+
+Alpha, personal spare-time project. Issues are welcome ([CONTRIBUTING.md](CONTRIBUTING.md) sets
+expectations); responses and fixes may take a while.
+
+Licensed under [Apache-2.0](LICENSE). "ManageEngine", "ServiceDesk Plus", "Zoho", "Microsoft",
+"Power Platform", "Power Automate", "Power Apps", and "Copilot Studio" are trademarks of their
+respective owners; this project is not affiliated with or endorsed by any of them.

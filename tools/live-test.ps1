@@ -13,7 +13,7 @@
   a disposable instance you own — never the demo.
 
 .EXAMPLE
-  # Read-only smoke test against the demo (use the demo key from PRD.md / README)
+  # Read-only smoke test against the public demo (reads only; see README for key scoping)
   ./tools/live-test.ps1 -HostName demo.servicedeskplus.com -ApiKey <your-api-key>
 
 .EXAMPLE
