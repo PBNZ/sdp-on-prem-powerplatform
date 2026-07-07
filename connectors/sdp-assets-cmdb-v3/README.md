@@ -11,6 +11,9 @@ Power Platform custom connector for ManageEngine ServiceDesk Plus On-Premises **
 
 - `apiDefinition.swagger.json` — the OpenAPI 2.0 definition (import this).
 - `apiProperties.json` — API key connection parameter + capabilities (cloud + gateway).
+- [`actions/`](actions/README.md) — **one "Learn more" page per operation** (generated):
+  every parameter explained, plus copy-paste `input_data` variations. Linked from each
+  imported action's About tab.
 
 ## Operations
 

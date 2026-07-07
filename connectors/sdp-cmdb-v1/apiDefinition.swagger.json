@@ -3,7 +3,7 @@
   "info": {
     "title": "SDP - CMDB (v1 legacy)",
     "description": "Legacy XML CMDB API for ManageEngine ServiceDesk Plus On-Premises builds below 15100 (where the CMDB v3 JSON API is unavailable). Lists/counts configuration items and reads/writes CI relationships. Auth: the technician key as the 'TECHNICIAN_KEY' query parameter (same secret value as the V3 'authtoken'). Write payloads are XML supplied in the 'INPUT_DATA' form field. Responses are JSON with the envelope { API: { response: { operation: { result, Details } } } }; success is result.statuscode 200. Definition (import-by-URL): https://raw.githubusercontent.com/PBNZ/sdp-on-prem-powerplatform/main/connectors/sdp-cmdb-v1/apiDefinition.swagger.json",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "contact": {
       "name": "Peter Braun",
       "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform"
@@ -26,10 +26,14 @@
       "get": {
         "operationId": "ListAllCIs",
         "summary": "List all CIs",
-        "description": "Lists all configuration items (legacy V1 CMDB API).",
+        "description": "Lists all configuration items (legacy V1 CMDB API). Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-cmdb-v1/actions/list-all-cis.md",
         "responses": {
           "200": { "description": "CIs returned.", "schema": { "$ref": "#/definitions/V1Envelope" } },
           "default": { "description": "V1 error (result.statuscode != 200) or V3-style rejection." }
+        },
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-cmdb-v1/actions/list-all-cis.md"
         }
       }
     },
@@ -37,10 +41,14 @@
       "get": {
         "operationId": "CountAllCIs",
         "summary": "Count all CIs",
-        "description": "Returns the total count of configuration items (legacy V1 CMDB API).",
+        "description": "Returns the total count of configuration items (legacy V1 CMDB API). Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-cmdb-v1/actions/count-all-cis.md",
         "responses": {
           "200": { "description": "Count returned.", "schema": { "$ref": "#/definitions/V1Envelope" } },
           "default": { "description": "V1 error (result.statuscode != 200) or V3-style rejection." }
+        },
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-cmdb-v1/actions/count-all-cis.md"
         }
       }
     },
@@ -48,7 +56,7 @@
       "get": {
         "operationId": "GetCIRelationships",
         "summary": "Get CI relationships",
-        "description": "Gets all relationships of a configuration item by CI name (case-sensitive). To filter by relationship type or find the relationship between two CIs, use the sub-path forms documented in the connector README.",
+        "description": "Gets all relationships of a configuration item by CI name (case-sensitive). To filter by relationship type or find the relationship between two CIs, use the sub-path forms documented in the connector README. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-cmdb-v1/actions/get-ci-relationships.md",
         "parameters": [
           {
             "name": "ci_name",
@@ -62,6 +70,10 @@
         "responses": {
           "200": { "description": "Relationships returned.", "schema": { "$ref": "#/definitions/V1Envelope" } },
           "default": { "description": "V1 error (result.statuscode != 200) or V3-style rejection." }
+        },
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-cmdb-v1/actions/get-ci-relationships.md"
         }
       }
     },
@@ -69,7 +81,7 @@
       "post": {
         "operationId": "ModifyCIRelationships",
         "summary": "Modify CI relationships",
-        "description": "Adds or deletes CI relationships. The operation (add or delete) is expressed in the XML payload supplied in INPUT_DATA. Add example: <?xml version=\"1.0\" encoding=\"UTF-8\"?><API version=\"1.0\" locale=\"en\"><records><relationships><addrelationship><toci>CI-A</toci><relationshiptype>Depends on</relationshiptype><relatedcis><citype>Windows Server</citype><ci><name>CI-B</name></ci></relatedcis></addrelationship></relationships></records></API>. Delete uses <deleterelationship><fromci>..</fromci>..</deleterelationship>.",
+        "description": "Adds or deletes CI relationships. The operation (add or delete) is expressed in the XML payload supplied in INPUT_DATA. Add example: <?xml version=\"1.0\" encoding=\"UTF-8\"?><API version=\"1.0\" locale=\"en\"><records><relationships><addrelationship><toci>CI-A</toci><relationshiptype>Depends on</relationshiptype><relatedcis><citype>Windows Server</citype><ci><name>CI-B</name></ci></relatedcis></addrelationship></relationships></records></API>. Delete uses <deleterelationship><fromci>..</fromci>..</deleterelationship>. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-cmdb-v1/actions/modify-ci-relationships.md",
         "consumes": ["application/x-www-form-urlencoded"],
         "parameters": [
           {
@@ -85,6 +97,10 @@
         "responses": {
           "200": { "description": "Relationship change applied.", "schema": { "$ref": "#/definitions/V1Envelope" } },
           "default": { "description": "V1 error (result.statuscode != 200) or V3-style rejection." }
+        },
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-cmdb-v1/actions/modify-ci-relationships.md"
         }
       }
     }

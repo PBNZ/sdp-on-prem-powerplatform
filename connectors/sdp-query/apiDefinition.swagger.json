@@ -3,7 +3,7 @@
   "info": {
     "title": "SDP - Query",
     "description": "Read-only power tool for ManageEngine ServiceDesk Plus On-Premises: run one SQL SELECT via the Execute Query report API to replace many REST GETs (JOINs, custom fields, aggregates). Auth: technician API key in the 'authtoken' header; the SELECT is wrapped in a single 'input_data' JSON envelope. Admin-scoped ('Create Query Report' permission) and build/edition-gated — probe with 'SELECT 1 AS test' at setup and fall back to REST if it errors. Physical schema names vary by build; keep SQL in the templates/ library. Definition (import-by-URL): https://raw.githubusercontent.com/PBNZ/sdp-on-prem-powerplatform/main/connectors/sdp-query/apiDefinition.swagger.json",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "contact": {
       "name": "Peter Braun",
       "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform"
@@ -34,7 +34,7 @@
       "post": {
         "operationId": "ExecuteQuery",
         "summary": "Execute query",
-        "description": "Runs a single read-only SQL SELECT against the SDP database and returns rows keyed by the column aliases. POST-only; SELECT-only (UPDATE/DELETE/INSERT and information_schema/catalog queries are rejected server-side). Physical table/column names are build-specific — see the templates/ library (build 14990).",
+        "description": "Runs a single read-only SQL SELECT against the SDP database and returns rows keyed by the column aliases. POST-only; SELECT-only (UPDATE/DELETE/INSERT and information_schema/catalog queries are rejected server-side). Physical table/column names are build-specific — see the templates/ library (build 14990). Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-query/actions/execute-query.md",
         "parameters": [
           {
             "name": "input_data",
@@ -62,7 +62,11 @@
         },
         "consumes": [
           "application/x-www-form-urlencoded"
-        ]
+        ],
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-query/actions/execute-query.md"
+        }
       }
     }
   },

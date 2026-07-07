@@ -3,7 +3,7 @@
   "info": {
     "title": "SDP - Assets & CMDB (v3)",
     "description": "Manage ManageEngine ServiceDesk Plus On-Premises assets and the CMDB (v3 JSON API): CI types, configuration items per type and across the CMDB, CI metadata, association relationships, and assets. Auth: technician API key in the 'authtoken' header; every parameter is wrapped in a single 'input_data' JSON envelope. Full CMDB v3 requires SDP build 15100+ (or AssetExplorer 7700+). Definition (import-by-URL): https://raw.githubusercontent.com/PBNZ/sdp-on-prem-powerplatform/main/connectors/sdp-assets-cmdb-v3/apiDefinition.swagger.json",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "contact": {
       "name": "Peter Braun",
       "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform"
@@ -34,7 +34,7 @@
       "get": {
         "operationId": "ListCITypes",
         "summary": "List CI types",
-        "description": "Lists all CMDB configuration-item types. Each has an api_plural_name used as the CI Type path segment.",
+        "description": "Lists all CMDB configuration-item types. Each has an api_plural_name used as the CI Type path segment. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-assets-cmdb-v3/actions/list-ci-types.md",
         "parameters": [
           {
             "name": "input_data",
@@ -60,6 +60,10 @@
           "default": {
             "description": "SDP error envelope (response_status.status_code != 2000)."
           }
+        },
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-assets-cmdb-v3/actions/list-ci-types.md"
         }
       }
     },
@@ -67,7 +71,7 @@
       "get": {
         "operationId": "ListAllCIs",
         "summary": "List all CIs",
-        "description": "Lists all configuration items across every type.",
+        "description": "Lists all configuration items across every type. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-assets-cmdb-v3/actions/list-all-cis.md",
         "parameters": [
           {
             "name": "input_data",
@@ -93,6 +97,10 @@
           "default": {
             "description": "SDP error envelope (response_status.status_code != 2000)."
           }
+        },
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-assets-cmdb-v3/actions/list-all-cis.md"
         }
       }
     },
@@ -100,7 +108,7 @@
       "get": {
         "operationId": "ListCIsByType",
         "summary": "List CIs by type",
-        "description": "Lists configuration items of one CI type. Set CI Type to the type's api_plural_name (from List CI types).",
+        "description": "Lists configuration items of one CI type. Set CI Type to the type's api_plural_name (from List CI types). Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-assets-cmdb-v3/actions/list-cis-by-type.md",
         "parameters": [
           {
             "name": "ci_type",
@@ -134,12 +142,16 @@
           "default": {
             "description": "SDP error envelope (response_status.status_code != 2000)."
           }
+        },
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-assets-cmdb-v3/actions/list-cis-by-type.md"
         }
       },
       "post": {
         "operationId": "CreateCI",
         "summary": "Create CI",
-        "description": "Creates a configuration item of the given type. The input_data payload wraps the CI object; confirm the field set against the type's metadata.",
+        "description": "Creates a configuration item of the given type. The input_data payload wraps the CI object; confirm the field set against the type's metadata. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-assets-cmdb-v3/actions/create-ci.md",
         "parameters": [
           {
             "name": "ci_type",
@@ -181,14 +193,18 @@
         },
         "consumes": [
           "application/x-www-form-urlencoded"
-        ]
+        ],
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-assets-cmdb-v3/actions/create-ci.md"
+        }
       }
     },
     "/{ci_type}/{ci_id}": {
       "get": {
         "operationId": "GetCI",
         "summary": "Get CI",
-        "description": "Gets a single configuration item by type and ID.",
+        "description": "Gets a single configuration item by type and ID. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-assets-cmdb-v3/actions/get-ci.md",
         "parameters": [
           {
             "name": "ci_type",
@@ -220,12 +236,16 @@
           "default": {
             "description": "SDP error envelope (response_status.status_code != 2000)."
           }
+        },
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-assets-cmdb-v3/actions/get-ci.md"
         }
       },
       "put": {
         "operationId": "UpdateCI",
         "summary": "Update CI",
-        "description": "Updates a configuration item by type and ID (V3 updates by CI ID only, no criteria-based update).",
+        "description": "Updates a configuration item by type and ID (V3 updates by CI ID only, no criteria-based update). Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-assets-cmdb-v3/actions/update-ci.md",
         "parameters": [
           {
             "name": "ci_type",
@@ -269,14 +289,18 @@
         },
         "consumes": [
           "application/x-www-form-urlencoded"
-        ]
+        ],
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-assets-cmdb-v3/actions/update-ci.md"
+        }
       }
     },
     "/{ci_type}/_metadata": {
       "get": {
         "operationId": "GetCITypeMetadata",
         "summary": "Get CI type metadata",
-        "description": "Gets the field/layout metadata for a CI type (its api_plural_name).",
+        "description": "Gets the field/layout metadata for a CI type (its api_plural_name). Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-assets-cmdb-v3/actions/get-ci-type-metadata.md",
         "parameters": [
           {
             "name": "ci_type",
@@ -300,6 +324,10 @@
           "default": {
             "description": "SDP error envelope (response_status.status_code != 2000)."
           }
+        },
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-assets-cmdb-v3/actions/get-ci-type-metadata.md"
         }
       }
     },
@@ -307,7 +335,7 @@
       "get": {
         "operationId": "ListCIRelationships",
         "summary": "List CI relationships",
-        "description": "Lists the association relationships of a CI (V3; requires SDP build 15100+).",
+        "description": "Lists the association relationships of a CI (V3; requires SDP build 15100+). Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-assets-cmdb-v3/actions/list-ci-relationships.md",
         "parameters": [
           {
             "name": "ci_type",
@@ -348,12 +376,16 @@
           "default": {
             "description": "SDP error envelope (response_status.status_code != 2000)."
           }
+        },
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-assets-cmdb-v3/actions/list-ci-relationships.md"
         }
       },
       "post": {
         "operationId": "AddCIRelationship",
         "summary": "Add CI relationship",
-        "description": "Adds an association relationship to a CI (V3; requires SDP build 15100+).",
+        "description": "Adds an association relationship to a CI (V3; requires SDP build 15100+). Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-assets-cmdb-v3/actions/add-ci-relationship.md",
         "parameters": [
           {
             "name": "ci_type",
@@ -403,14 +435,18 @@
         },
         "consumes": [
           "application/x-www-form-urlencoded"
-        ]
+        ],
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-assets-cmdb-v3/actions/add-ci-relationship.md"
+        }
       }
     },
     "/asset_modules": {
       "get": {
         "operationId": "ListAssetModules",
         "summary": "List asset modules",
-        "description": "Lists the asset type/module hierarchy.",
+        "description": "Lists the asset type/module hierarchy. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-assets-cmdb-v3/actions/list-asset-modules.md",
         "parameters": [
           {
             "name": "input_data",
@@ -436,6 +472,10 @@
           "default": {
             "description": "SDP error envelope (response_status.status_code != 2000)."
           }
+        },
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-assets-cmdb-v3/actions/list-asset-modules.md"
         }
       }
     },
@@ -443,7 +483,7 @@
       "get": {
         "operationId": "ListAssets",
         "summary": "List assets",
-        "description": "Lists assets with pagination and search criteria.",
+        "description": "Lists assets with pagination and search criteria. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-assets-cmdb-v3/actions/list-assets.md",
         "parameters": [
           {
             "name": "input_data",
@@ -469,6 +509,10 @@
           "default": {
             "description": "SDP error envelope (response_status.status_code != 2000)."
           }
+        },
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-assets-cmdb-v3/actions/list-assets.md"
         }
       }
     },
@@ -476,7 +520,7 @@
       "get": {
         "operationId": "GetAsset",
         "summary": "Get asset",
-        "description": "Gets a single asset by its ID.",
+        "description": "Gets a single asset by its ID. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-assets-cmdb-v3/actions/get-asset.md",
         "parameters": [
           {
             "name": "asset_id",
@@ -500,12 +544,16 @@
           "default": {
             "description": "SDP error envelope (response_status.status_code != 2000)."
           }
+        },
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-assets-cmdb-v3/actions/get-asset.md"
         }
       },
       "put": {
         "operationId": "UpdateAsset",
         "summary": "Update asset",
-        "description": "Updates an existing asset; only provided fields change.",
+        "description": "Updates an existing asset; only provided fields change. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-assets-cmdb-v3/actions/update-asset.md",
         "parameters": [
           {
             "name": "asset_id",
@@ -541,7 +589,11 @@
         },
         "consumes": [
           "application/x-www-form-urlencoded"
-        ]
+        ],
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-assets-cmdb-v3/actions/update-asset.md"
+        }
       }
     }
   },

@@ -21,8 +21,25 @@ import os
 ACCEPT = "application/vnd.manageengine.sdp.v3+json"
 RAW_URL = ("https://raw.githubusercontent.com/PBNZ/sdp-on-prem-powerplatform"
            "/main/connectors/{}/apiDefinition.swagger.json")
+DOC_URL = ("https://github.com/PBNZ/sdp-on-prem-powerplatform"
+           "/blob/main/connectors/{}/actions/{}.md")
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
+
+
+def kebab(op_id):
+    """AddRequestNote -> add-request-note. 'CI'/'CIs' count as one word so
+    ListCIsByType -> list-cis-by-type (shared with gen_action_docs.py)."""
+    s = op_id.replace("CIs", "Cis").replace("CI", "Ci")
+    return "".join(
+        ("-" if i and not s[i - 1].isupper() and c.isupper() else "") + c.lower()
+        for i, c in enumerate(s))
+
+
+def action_doc_url(connector, op_id):
+    """Human-facing per-action doc page (blob URL renders the markdown;
+    the raw-vs-blob trap only applies to definition *imports*)."""
+    return DOC_URL.format(connector, kebab(op_id))
 
 
 # --- shared building blocks -------------------------------------------------
@@ -154,7 +171,7 @@ def build(title, description, base_path, ops, definitions):
         "info": {
             "title": title,
             "description": description,
-            "version": "0.2.0",
+            "version": "0.3.0",
             "contact": {"name": "Peter Braun", "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform"},
         },
         "host": "sdp.example.com",
@@ -576,6 +593,16 @@ def main():
         os.makedirs(out_dir, exist_ok=True)
         doc = fn()
         doc["info"]["description"] += " Definition (import-by-URL): " + RAW_URL.format(name)
+        # Per-action "Learn more" links, belt and braces: externalDocs is the
+        # Swagger 2.0 field for exactly this (allowed on operations by
+        # Microsoft's connector schema), and the URL is also appended to the
+        # description because the flow designer's About tab provably shows the
+        # description text ("Operation note") for custom connectors.
+        for methods in doc["paths"].values():
+            for o in methods.values():
+                url = action_doc_url(name, o["operationId"])
+                o["description"] = o["description"].rstrip() + " Learn more: " + url
+                o["externalDocs"] = {"description": "Learn more", "url": url}
         n_ops = sum(len(m) for m in doc["paths"].values())
         path = os.path.join(out_dir, "apiDefinition.swagger.json")
         with open(path, "w", encoding="utf-8", newline="\n") as f:
