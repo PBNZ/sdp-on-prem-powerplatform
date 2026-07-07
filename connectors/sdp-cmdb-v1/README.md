@@ -22,6 +22,10 @@ tightly.
 
 ## Operations
 
+Each operation has its own **Learn more** page under [`actions/`](actions/README.md) —
+parameters, the XML `INPUT_DATA` templates, and the V1 response envelope — linked from the
+imported action's About tab.
+
 | Operation | Method | Path | Notes |
 |---|---|---|---|
 | List all CIs | GET | `/cmdb/ci/list/all` | Verified live. |

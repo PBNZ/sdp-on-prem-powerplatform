@@ -5,6 +5,9 @@ Thumbs.db
 .idea/
 .vscode/
 
+# Python bytecode (tools/ scripts import each other)
+__pycache__/
+
 # Secrets (never commit); .env.example IS the committed template
 .env
 .env.*

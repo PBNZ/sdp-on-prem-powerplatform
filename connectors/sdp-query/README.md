@@ -10,6 +10,9 @@ across modules, custom fields, aggregates). 1 operation. **Generated** by `tools
 |---|---|---|
 | Execute query | POST | `/reports/_execute_query` |
 
+Full parameter reference + SQL-in-JSON formatting variations:
+[`actions/execute-query.md`](actions/execute-query.md) (the action's **Learn more** link).
+
 Body: `input_data={"query":"SELECT ... AS alias ..."}`. Response:
 `{ "response_status": {...}, "execute_query": { "data": [ {row}, ... ] } }` — each row is keyed by
 your SQL **column aliases**, so **always alias columns with `AS`**.

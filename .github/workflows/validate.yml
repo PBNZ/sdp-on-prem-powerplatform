@@ -29,6 +29,11 @@ jobs:
       - name: Power Platform x-ms rules
         run: python3 tools/check_pp_rules.py
 
+      # Every operation links a per-action doc (externalDocs + description
+      # suffix); this keeps links, docs, and parameter coverage in lockstep.
+      - name: Learn-more links & action-doc coverage
+        run: python3 tools/check_action_docs.py
+
       - name: Enforce Power Platform 1 MB import cap
         run: |
           for f in connectors/*/apiDefinition.swagger.json; do
@@ -50,7 +55,8 @@ jobs:
           PY
           done
 
-      - name: Generator sync (committed JSON matches generator output)
+      - name: Generator sync (committed JSON + action docs match generator output)
         run: |
           python3 tools/gen_swagger.py
+          python3 tools/gen_action_docs.py
           git diff --exit-code connectors/

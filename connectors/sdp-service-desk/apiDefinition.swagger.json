@@ -3,7 +3,7 @@
   "info": {
     "title": "SDP - Service Desk",
     "description": "Work with ManageEngine ServiceDesk Plus On-Premises requests, changes, problems, solutions, notes, worklogs, tasks, and resolutions, plus admin lookups for dropdowns. Auth: technician API key in the 'authtoken' header. Every parameter is wrapped in a single 'input_data' JSON envelope per the SDP V3 API contract. Definition (import-by-URL): https://raw.githubusercontent.com/PBNZ/sdp-on-prem-powerplatform/main/connectors/sdp-service-desk/apiDefinition.swagger.json",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "contact": {
       "name": "Peter Braun",
       "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform"
@@ -34,7 +34,7 @@
       "get": {
         "operationId": "ListRequests",
         "summary": "List requests",
-        "description": "Lists service desk requests with pagination, sorting, and search criteria.",
+        "description": "Lists service desk requests with pagination, sorting, and search criteria. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/list-requests.md",
         "parameters": [
           {
             "name": "input_data",
@@ -60,12 +60,16 @@
           "default": {
             "description": "SDP error envelope (response_status.status_code != 2000)."
           }
+        },
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/list-requests.md"
         }
       },
       "post": {
         "operationId": "CreateRequest",
         "summary": "Create request",
-        "description": "Creates a new service desk request. Only subject is required.",
+        "description": "Creates a new service desk request. Only subject is required. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/create-request.md",
         "parameters": [
           {
             "name": "input_data",
@@ -99,14 +103,18 @@
         },
         "consumes": [
           "application/x-www-form-urlencoded"
-        ]
+        ],
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/create-request.md"
+        }
       }
     },
     "/requests/{request_id}": {
       "get": {
         "operationId": "GetRequest",
         "summary": "Get request",
-        "description": "Gets the full details of a single service desk request by its ID.",
+        "description": "Gets the full details of a single service desk request by its ID. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/get-request.md",
         "parameters": [
           {
             "name": "request_id",
@@ -130,12 +138,16 @@
           "default": {
             "description": "SDP error envelope (response_status.status_code != 2000)."
           }
+        },
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/get-request.md"
         }
       },
       "put": {
         "operationId": "UpdateRequest",
         "summary": "Update request",
-        "description": "Updates an existing request; only provided fields change.",
+        "description": "Updates an existing request; only provided fields change. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/update-request.md",
         "parameters": [
           {
             "name": "request_id",
@@ -171,12 +183,16 @@
         },
         "consumes": [
           "application/x-www-form-urlencoded"
-        ]
+        ],
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/update-request.md"
+        }
       },
       "delete": {
         "operationId": "DeleteRequest",
         "summary": "Delete request",
-        "description": "Moves a request to the trash (destructive).",
+        "description": "Moves a request to the trash (destructive). Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/delete-request.md",
         "parameters": [
           {
             "name": "request_id",
@@ -200,6 +216,10 @@
           "default": {
             "description": "SDP error envelope (response_status.status_code != 2000)."
           }
+        },
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/delete-request.md"
         }
       }
     },
@@ -207,7 +227,7 @@
       "put": {
         "operationId": "CloseRequest",
         "summary": "Close request",
-        "description": "Closes a request with optional closure details. Mandatory fields and workflow status transitions may be required first.",
+        "description": "Closes a request with optional closure details. Mandatory fields and workflow status transitions may be required first. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/close-request.md",
         "parameters": [
           {
             "name": "request_id",
@@ -243,14 +263,18 @@
         },
         "consumes": [
           "application/x-www-form-urlencoded"
-        ]
+        ],
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/close-request.md"
+        }
       }
     },
     "/requests/{request_id}/notes": {
       "get": {
         "operationId": "ListRequestNotes",
         "summary": "List request notes",
-        "description": "Lists notes attached to a request.",
+        "description": "Lists notes attached to a request. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/list-request-notes.md",
         "parameters": [
           {
             "name": "request_id",
@@ -283,12 +307,16 @@
           "default": {
             "description": "SDP error envelope (response_status.status_code != 2000)."
           }
+        },
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/list-request-notes.md"
         }
       },
       "post": {
         "operationId": "AddRequestNote",
         "summary": "Add request note",
-        "description": "Adds a note to a request.",
+        "description": "Adds a note to a request. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/add-request-note.md",
         "parameters": [
           {
             "name": "request_id",
@@ -330,14 +358,18 @@
         },
         "consumes": [
           "application/x-www-form-urlencoded"
-        ]
+        ],
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/add-request-note.md"
+        }
       }
     },
     "/requests/{request_id}/worklogs": {
       "get": {
         "operationId": "ListRequestWorklogs",
         "summary": "List request worklogs",
-        "description": "Lists worklogs (time entries) for a request.",
+        "description": "Lists worklogs (time entries) for a request. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/list-request-worklogs.md",
         "parameters": [
           {
             "name": "request_id",
@@ -370,12 +402,16 @@
           "default": {
             "description": "SDP error envelope (response_status.status_code != 2000)."
           }
+        },
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/list-request-worklogs.md"
         }
       },
       "post": {
         "operationId": "AddRequestWorklog",
         "summary": "Add request worklog",
-        "description": "Adds a worklog (time entry) to a request.",
+        "description": "Adds a worklog (time entry) to a request. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/add-request-worklog.md",
         "parameters": [
           {
             "name": "request_id",
@@ -417,14 +453,18 @@
         },
         "consumes": [
           "application/x-www-form-urlencoded"
-        ]
+        ],
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/add-request-worklog.md"
+        }
       }
     },
     "/requests/{request_id}/tasks": {
       "get": {
         "operationId": "ListRequestTasks",
         "summary": "List request tasks",
-        "description": "Lists tasks associated with a request.",
+        "description": "Lists tasks associated with a request. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/list-request-tasks.md",
         "parameters": [
           {
             "name": "request_id",
@@ -457,6 +497,10 @@
           "default": {
             "description": "SDP error envelope (response_status.status_code != 2000)."
           }
+        },
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/list-request-tasks.md"
         }
       }
     },
@@ -464,7 +508,7 @@
       "get": {
         "operationId": "GetRequestResolution",
         "summary": "Get request resolution",
-        "description": "Gets the resolution of a request.",
+        "description": "Gets the resolution of a request. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/get-request-resolution.md",
         "parameters": [
           {
             "name": "request_id",
@@ -488,12 +532,16 @@
           "default": {
             "description": "SDP error envelope (response_status.status_code != 2000)."
           }
+        },
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/get-request-resolution.md"
         }
       },
       "post": {
         "operationId": "AddRequestResolution",
         "summary": "Add request resolution",
-        "description": "Adds/sets the resolution of a request.",
+        "description": "Adds/sets the resolution of a request. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/add-request-resolution.md",
         "parameters": [
           {
             "name": "request_id",
@@ -535,14 +583,18 @@
         },
         "consumes": [
           "application/x-www-form-urlencoded"
-        ]
+        ],
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/add-request-resolution.md"
+        }
       }
     },
     "/changes": {
       "get": {
         "operationId": "ListChanges",
         "summary": "List changes",
-        "description": "Lists change requests with pagination and search criteria.",
+        "description": "Lists change requests with pagination and search criteria. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/list-changes.md",
         "parameters": [
           {
             "name": "input_data",
@@ -568,12 +620,16 @@
           "default": {
             "description": "SDP error envelope (response_status.status_code != 2000)."
           }
+        },
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/list-changes.md"
         }
       },
       "post": {
         "operationId": "CreateChange",
         "summary": "Create change",
-        "description": "Creates a new change. title is required.",
+        "description": "Creates a new change. title is required. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/create-change.md",
         "parameters": [
           {
             "name": "input_data",
@@ -607,14 +663,18 @@
         },
         "consumes": [
           "application/x-www-form-urlencoded"
-        ]
+        ],
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/create-change.md"
+        }
       }
     },
     "/changes/{change_id}": {
       "get": {
         "operationId": "GetChange",
         "summary": "Get change",
-        "description": "Gets full details of a single change by its ID.",
+        "description": "Gets full details of a single change by its ID. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/get-change.md",
         "parameters": [
           {
             "name": "change_id",
@@ -638,12 +698,16 @@
           "default": {
             "description": "SDP error envelope (response_status.status_code != 2000)."
           }
+        },
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/get-change.md"
         }
       },
       "put": {
         "operationId": "UpdateChange",
         "summary": "Update change",
-        "description": "Updates an existing change; only provided fields change.",
+        "description": "Updates an existing change; only provided fields change. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/update-change.md",
         "parameters": [
           {
             "name": "change_id",
@@ -679,14 +743,18 @@
         },
         "consumes": [
           "application/x-www-form-urlencoded"
-        ]
+        ],
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/update-change.md"
+        }
       }
     },
     "/problems": {
       "get": {
         "operationId": "ListProblems",
         "summary": "List problems",
-        "description": "Lists problems with pagination and search criteria.",
+        "description": "Lists problems with pagination and search criteria. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/list-problems.md",
         "parameters": [
           {
             "name": "input_data",
@@ -712,12 +780,16 @@
           "default": {
             "description": "SDP error envelope (response_status.status_code != 2000)."
           }
+        },
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/list-problems.md"
         }
       },
       "post": {
         "operationId": "CreateProblem",
         "summary": "Create problem",
-        "description": "Creates a new problem. title is required.",
+        "description": "Creates a new problem. title is required. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/create-problem.md",
         "parameters": [
           {
             "name": "input_data",
@@ -751,14 +823,18 @@
         },
         "consumes": [
           "application/x-www-form-urlencoded"
-        ]
+        ],
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/create-problem.md"
+        }
       }
     },
     "/problems/{problem_id}": {
       "get": {
         "operationId": "GetProblem",
         "summary": "Get problem",
-        "description": "Gets full details of a single problem by its ID.",
+        "description": "Gets full details of a single problem by its ID. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/get-problem.md",
         "parameters": [
           {
             "name": "problem_id",
@@ -782,12 +858,16 @@
           "default": {
             "description": "SDP error envelope (response_status.status_code != 2000)."
           }
+        },
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/get-problem.md"
         }
       },
       "put": {
         "operationId": "UpdateProblem",
         "summary": "Update problem",
-        "description": "Updates an existing problem; only provided fields change.",
+        "description": "Updates an existing problem; only provided fields change. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/update-problem.md",
         "parameters": [
           {
             "name": "problem_id",
@@ -823,14 +903,18 @@
         },
         "consumes": [
           "application/x-www-form-urlencoded"
-        ]
+        ],
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/update-problem.md"
+        }
       }
     },
     "/solutions": {
       "get": {
         "operationId": "ListSolutions",
         "summary": "List solutions",
-        "description": "Lists knowledge base / solution articles.",
+        "description": "Lists knowledge base / solution articles. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/list-solutions.md",
         "parameters": [
           {
             "name": "input_data",
@@ -856,12 +940,16 @@
           "default": {
             "description": "SDP error envelope (response_status.status_code != 2000)."
           }
+        },
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/list-solutions.md"
         }
       },
       "post": {
         "operationId": "CreateSolution",
         "summary": "Create solution",
-        "description": "Creates a new solution article. title is required.",
+        "description": "Creates a new solution article. title is required. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/create-solution.md",
         "parameters": [
           {
             "name": "input_data",
@@ -895,14 +983,18 @@
         },
         "consumes": [
           "application/x-www-form-urlencoded"
-        ]
+        ],
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/create-solution.md"
+        }
       }
     },
     "/solutions/{solution_id}": {
       "get": {
         "operationId": "GetSolution",
         "summary": "Get solution",
-        "description": "Gets a single solution article by its ID.",
+        "description": "Gets a single solution article by its ID. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/get-solution.md",
         "parameters": [
           {
             "name": "solution_id",
@@ -926,12 +1018,16 @@
           "default": {
             "description": "SDP error envelope (response_status.status_code != 2000)."
           }
+        },
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/get-solution.md"
         }
       },
       "put": {
         "operationId": "UpdateSolution",
         "summary": "Update solution",
-        "description": "Updates an existing solution article; only provided fields change.",
+        "description": "Updates an existing solution article; only provided fields change. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/update-solution.md",
         "parameters": [
           {
             "name": "solution_id",
@@ -967,14 +1063,18 @@
         },
         "consumes": [
           "application/x-www-form-urlencoded"
-        ]
+        ],
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/update-solution.md"
+        }
       }
     },
     "/technicians": {
       "get": {
         "operationId": "ListTechnicians",
         "summary": "List technicians",
-        "description": "Lists technicians. Intended as a dropdown source.",
+        "description": "Lists technicians. Intended as a dropdown source. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/list-technicians.md",
         "parameters": [
           {
             "name": "input_data",
@@ -1001,14 +1101,18 @@
             "description": "SDP error envelope (response_status.status_code != 2000)."
           }
         },
-        "x-ms-visibility": "advanced"
+        "x-ms-visibility": "advanced",
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/list-technicians.md"
+        }
       }
     },
     "/users": {
       "get": {
         "operationId": "ListRequesters",
         "summary": "List requesters",
-        "description": "Lists requesters / end users (the /users module; some builds use /requesters). Intended as a dropdown source.",
+        "description": "Lists requesters / end users (the /users module; some builds use /requesters). Intended as a dropdown source. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/list-requesters.md",
         "parameters": [
           {
             "name": "input_data",
@@ -1035,14 +1139,18 @@
             "description": "SDP error envelope (response_status.status_code != 2000)."
           }
         },
-        "x-ms-visibility": "advanced"
+        "x-ms-visibility": "advanced",
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/list-requesters.md"
+        }
       }
     },
     "/categories": {
       "get": {
         "operationId": "ListCategories",
         "summary": "List categories",
-        "description": "Lists request categories. Intended as a dropdown source.",
+        "description": "Lists request categories. Intended as a dropdown source. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/list-categories.md",
         "parameters": [
           {
             "name": "input_data",
@@ -1069,14 +1177,18 @@
             "description": "SDP error envelope (response_status.status_code != 2000)."
           }
         },
-        "x-ms-visibility": "advanced"
+        "x-ms-visibility": "advanced",
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/list-categories.md"
+        }
       }
     },
     "/statuses": {
       "get": {
         "operationId": "ListStatuses",
         "summary": "List statuses",
-        "description": "Lists request statuses. Intended as a dropdown source.",
+        "description": "Lists request statuses. Intended as a dropdown source. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/list-statuses.md",
         "parameters": [
           {
             "name": "input_data",
@@ -1103,14 +1215,18 @@
             "description": "SDP error envelope (response_status.status_code != 2000)."
           }
         },
-        "x-ms-visibility": "advanced"
+        "x-ms-visibility": "advanced",
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/list-statuses.md"
+        }
       }
     },
     "/priorities": {
       "get": {
         "operationId": "ListPriorities",
         "summary": "List priorities",
-        "description": "Lists priority levels. Intended as a dropdown source.",
+        "description": "Lists priority levels. Intended as a dropdown source. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/list-priorities.md",
         "parameters": [
           {
             "name": "input_data",
@@ -1137,14 +1253,18 @@
             "description": "SDP error envelope (response_status.status_code != 2000)."
           }
         },
-        "x-ms-visibility": "advanced"
+        "x-ms-visibility": "advanced",
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/list-priorities.md"
+        }
       }
     },
     "/sites": {
       "get": {
         "operationId": "ListSites",
         "summary": "List sites",
-        "description": "Lists sites (locations). Intended as a dropdown source.",
+        "description": "Lists sites (locations). Intended as a dropdown source. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/list-sites.md",
         "parameters": [
           {
             "name": "input_data",
@@ -1171,14 +1291,18 @@
             "description": "SDP error envelope (response_status.status_code != 2000)."
           }
         },
-        "x-ms-visibility": "advanced"
+        "x-ms-visibility": "advanced",
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/list-sites.md"
+        }
       }
     },
     "/support_groups": {
       "get": {
         "operationId": "ListSupportGroups",
         "summary": "List support groups",
-        "description": "Lists technician/support groups (the /support_groups module; some builds use /groups). Intended as a dropdown source.",
+        "description": "Lists technician/support groups (the /support_groups module; some builds use /groups). Intended as a dropdown source. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/list-support-groups.md",
         "parameters": [
           {
             "name": "input_data",
@@ -1205,14 +1329,18 @@
             "description": "SDP error envelope (response_status.status_code != 2000)."
           }
         },
-        "x-ms-visibility": "advanced"
+        "x-ms-visibility": "advanced",
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/list-support-groups.md"
+        }
       }
     },
     "/departments": {
       "get": {
         "operationId": "ListDepartments",
         "summary": "List departments",
-        "description": "Lists departments. Intended as a dropdown source.",
+        "description": "Lists departments. Intended as a dropdown source. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/list-departments.md",
         "parameters": [
           {
             "name": "input_data",
@@ -1239,14 +1367,18 @@
             "description": "SDP error envelope (response_status.status_code != 2000)."
           }
         },
-        "x-ms-visibility": "advanced"
+        "x-ms-visibility": "advanced",
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/list-departments.md"
+        }
       }
     },
     "/urgencies": {
       "get": {
         "operationId": "ListUrgencies",
         "summary": "List urgencies",
-        "description": "Lists urgency levels. Intended as a dropdown source.",
+        "description": "Lists urgency levels. Intended as a dropdown source. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/list-urgencies.md",
         "parameters": [
           {
             "name": "input_data",
@@ -1273,14 +1405,18 @@
             "description": "SDP error envelope (response_status.status_code != 2000)."
           }
         },
-        "x-ms-visibility": "advanced"
+        "x-ms-visibility": "advanced",
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/list-urgencies.md"
+        }
       }
     },
     "/impacts": {
       "get": {
         "operationId": "ListImpacts",
         "summary": "List impacts",
-        "description": "Lists impact levels. Intended as a dropdown source.",
+        "description": "Lists impact levels. Intended as a dropdown source. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/list-impacts.md",
         "parameters": [
           {
             "name": "input_data",
@@ -1307,14 +1443,18 @@
             "description": "SDP error envelope (response_status.status_code != 2000)."
           }
         },
-        "x-ms-visibility": "advanced"
+        "x-ms-visibility": "advanced",
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/list-impacts.md"
+        }
       }
     },
     "/modes": {
       "get": {
         "operationId": "ListModes",
         "summary": "List modes",
-        "description": "Lists request submission modes. Intended as a dropdown source.",
+        "description": "Lists request submission modes. Intended as a dropdown source. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/list-modes.md",
         "parameters": [
           {
             "name": "input_data",
@@ -1341,14 +1481,18 @@
             "description": "SDP error envelope (response_status.status_code != 2000)."
           }
         },
-        "x-ms-visibility": "advanced"
+        "x-ms-visibility": "advanced",
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/list-modes.md"
+        }
       }
     },
     "/request_types": {
       "get": {
         "operationId": "ListRequestTypes",
         "summary": "List request types",
-        "description": "Lists request types (e.g. Incident, Service Request). Intended as a dropdown source.",
+        "description": "Lists request types (e.g. Incident, Service Request). Intended as a dropdown source. Learn more: https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/list-request-types.md",
         "parameters": [
           {
             "name": "input_data",
@@ -1375,7 +1519,11 @@
             "description": "SDP error envelope (response_status.status_code != 2000)."
           }
         },
-        "x-ms-visibility": "advanced"
+        "x-ms-visibility": "advanced",
+        "externalDocs": {
+          "description": "Learn more",
+          "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform/blob/main/connectors/sdp-service-desk/actions/list-request-types.md"
+        }
       }
     }
   },
