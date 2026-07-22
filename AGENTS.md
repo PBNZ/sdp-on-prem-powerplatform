@@ -29,6 +29,9 @@ checklists, use the `repo-standard` skill (RepoKit: `/plugin marketplace add PBN
 - Conventional Commits; one concern per PR. Record notable decisions as ADRs in `docs/adr/`.
 - Ceremony scales by visibility — this repo is at the **Core + Public** tier (published as a
   clearly-flagged personal alpha; see ADR-0002).
+- Identify the author by the GitHub handle `PBNZ`, never a real personal name — in file contents,
+  connector `info.contact`, and the commit identity alike (see
+  [repo-kit#25](https://github.com/PBNZ/repo-kit/issues/25)). CI fails the build if one reappears.
 - Connector definitions are **hand-authored OpenAPI 2.0** (see ADR-0001) — never regenerate them
   from the Postman collection, and never commit an API key into a definition file.
 - The public demo (`demo.servicedeskplus.com`) is **read-only** — never create/update/delete

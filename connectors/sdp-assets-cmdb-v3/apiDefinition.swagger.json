@@ -5,7 +5,7 @@
     "description": "Manage ManageEngine ServiceDesk Plus On-Premises assets and the CMDB (v3 JSON API): CI types, configuration items per type and across the CMDB, CI metadata, association relationships, and assets. Auth: technician API key in the 'authtoken' header; every parameter is wrapped in a single 'input_data' JSON envelope. Full CMDB v3 requires SDP build 15100+ (or AssetExplorer 7700+). Definition (import-by-URL): https://raw.githubusercontent.com/PBNZ/sdp-on-prem-powerplatform/main/connectors/sdp-assets-cmdb-v3/apiDefinition.swagger.json",
     "version": "0.3.0",
     "contact": {
-      "name": "Peter Braun",
+      "name": "PBNZ",
       "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform"
     }
   },

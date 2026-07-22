@@ -7,7 +7,7 @@
 
 New repo for Power Platform custom connectors for ServiceDesk Plus On-Premises, scaffolded to
 the RepoKit standard (`/new-repo`, type `power-platform-connectors`, visibility `private` =
-Core tier, author Peter Braun, licence Apache-2.0 on publication).
+Core tier, author `PBNZ`, licence Apache-2.0 on publication).
 
 RepoKit's `power-platform-connectors` type template assumes connectors are **generated from a
 committed Postman collection** (Dockerfile + `generate.mjs` pipeline). The PRD for this project

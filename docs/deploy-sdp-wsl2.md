@@ -16,8 +16,8 @@ public demo. Battle-tested end-to-end on **2026-07-06** (a full redeploy).
 | | |
 |---|---|
 | WSL distro | `ubuntu-server-lts`, run as **root**: `wsl -d ubuntu-server-lts -u root` |
-| Install root (`$SDP`) | `/home/peter/ManageEngine/ServiceDesk` |
-| Installer + expect script | `/home/peter/sdp-work/` (`ManageEngine_ServiceDesk_Plus.bin`, `install.exp`) |
+| Install root (`$SDP`) | `/home/<you>/ManageEngine/ServiceDesk` — `<you>` is the Linux user that owns the install (commands run as root, so `$HOME` is *not* it) |
+| Installer + expect script | `/home/<you>/sdp-work/` (`ManageEngine_ServiceDesk_Plus.bin`, `install.exp`) |
 | Web UI | **`https://localhost:8080`** — HTTPS ONLY (plain HTTP returns HTTP 400 "requires TLS") |
 | First login | `administrator` / `administrator` (works on a **fresh** install) |
 | Postgres | `127.0.0.1:65432`, app user `sdpadmin` / `sdpadmin`, db `servicedesk` |
@@ -47,10 +47,17 @@ All commands run as root in `ubuntu-server-lts`. Prefix each with
 `wsl -d ubuntu-server-lts -u root -- bash -c '<cmd>'`, **or** put multi-line scripts in a file and
 run them (see the *WSL2 + PowerShell quoting* note at the bottom — inline heredocs get mangled).
 
+`<you>` below is the Linux user that owns the install — **not** root, so `$HOME` is not it.
+Substitute it once:
+
+```bash
+export SDP=/home/<you>/ManageEngine/ServiceDesk   # set <you> once; every step below uses $SDP
+```
+
 ### 1. Stop the old instance and free the ports
 
 ```bash
-cd /home/peter/ManageEngine/ServiceDesk/bin
+cd /home/<you>/ManageEngine/ServiceDesk/bin
 ./shutdown.sh -S                      # stops Tomcat; usually stops Postgres too
 sleep 8
 ss -ltn | grep -E ':8080|:65432'      # if 65432 still listed, the postmaster lingered:
@@ -60,23 +67,29 @@ ss -ltn | grep -E ':8080|:65432'      # if 65432 still listed, the postmaster li
 ### 2. Move the expired install aside (reversible — don't delete yet)
 
 ```bash
-mv /home/peter/ManageEngine /home/peter/ManageEngine.expired-$(date +%Y%m%d)
+mv /home/<you>/ManageEngine /home/<you>/ManageEngine.expired-$(date +%Y%m%d)
 ```
 
 Keep it until the new instance is verified, then delete to reclaim ~2 GB.
 
 ### 3. Verify the installer, then run it fresh
 
-The `.bin` and the working `expect` driver are already staged in `/home/peter/sdp-work/`.
+The `.bin` and the working `expect` driver are already staged in `/home/<you>/sdp-work/`.
 
 ```bash
-cd /home/peter/sdp-work
+cd /home/<you>/sdp-work
 echo "0c003369d49453901b1db8b08b5a1a317d47e01eac394866bd544b823c583944  ManageEngine_ServiceDesk_Plus.bin" | sha256sum -c
 ./install.exp > install-redeploy-$(date +%Y%m%d).log 2>&1
 tail -5 "$(ls -t install-redeploy-*.log | head -1)"   # expect: "Installation Complete"
 ```
 
-`install.exp` targets `/home/peter/ManageEngine/ServiceDesk`, answers the console prompts
+> [!IMPORTANT]
+> The install target is **hardcoded inside `install.exp`**, so `$SDP` does not reach it. If your
+> `<you>` is not the user the script was written for, edit that path in the script *before*
+> running it — check with `grep -n ManageEngine install.exp`. Step 2 has already moved the old
+> install aside by this point, so getting this wrong deploys to the wrong home directory.
+
+`install.exp` targets `/home/<you>/ManageEngine/ServiceDesk`, answers the console prompts
 (license Y, no support registration, install-not-as-service, default ports), and quits. ~5 min
 (the slow part is `unpack200`-ing ~330 jars). If it ever hangs, the two prompts that historically
 tripped it up are the `IS THIS CORRECT? (Y/N)` after the folder choice and
@@ -88,16 +101,16 @@ WSL home dirs default to `750`; the system `postgres` user needs `o+x` on each p
 Postgres fails with *Permission denied* on its own data dir.
 
 ```bash
-chmod o+x /home/peter \
-          /home/peter/ManageEngine \
-          /home/peter/ManageEngine/ServiceDesk \
-          /home/peter/ManageEngine/ServiceDesk/pgsql
+chmod o+x /home/<you> \
+          /home/<you>/ManageEngine \
+          /home/<you>/ManageEngine/ServiceDesk \
+          /home/<you>/ManageEngine/ServiceDesk/pgsql
 ```
 
 ### 5. Start Postgres, then SDP
 
 ```bash
-cd /home/peter/ManageEngine/ServiceDesk/bin
+cd /home/<you>/ManageEngine/ServiceDesk/bin
 ./startDB.sh > /tmp/startdb.log 2>&1
 sleep 8 && ss -ltn | grep 65432          # Postgres up on 65432
 
@@ -168,7 +181,7 @@ reliable one.
 ## Shut down when done
 
 ```bash
-cd /home/peter/ManageEngine/ServiceDesk/bin && ./shutdown.sh -S
+cd /home/<you>/ManageEngine/ServiceDesk/bin && ./shutdown.sh -S
 ```
 
 Or stop the whole distro from Windows:

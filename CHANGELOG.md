@@ -41,6 +41,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Connector contact metadata (`info.contact.name`) in all four definitions is now the GitHub
+  handle `PBNZ` rather than a personal name, matching the `url` beside it
+  ([repo-kit#25](https://github.com/PBNZ/repo-kit/issues/25)). Metadata only — no operation,
+  path, parameter, or response changed, so definition versions are unchanged and a re-import is
+  not required.
 - Every operation now carries `externalDocs` (allowed on operations by Microsoft's connector
   schema) **and** a trailing `Learn more: <url>` on its description — the About tab's
   "Operation note" shows the description, so the link is visible either way. Definition

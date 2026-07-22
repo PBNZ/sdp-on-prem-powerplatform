@@ -60,3 +60,12 @@ jobs:
           python3 tools/gen_swagger.py
           python3 tools/gen_action_docs.py
           git diff --exit-code connectors/
+
+      - name: No real personal name in the tree (repo-kit#25 — author is the handle PBNZ)
+        # Patterns are bracketed ([p]eter) so this step never matches its own source.
+        run: |
+          if git grep -Iin -e '[p]eter' -e '[b]raun' -- . ; then
+            echo "::error::A real personal name appears above. Identify the author as PBNZ."
+            exit 1
+          fi
+          echo "No real personal name found in tracked files."

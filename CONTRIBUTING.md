@@ -27,6 +27,8 @@ may take a while, and the project's direction follows the maintainer's own use c
 - [Conventional Commits](https://www.conventionalcommits.org/); one concern per PR; add
   user-visible changes to `CHANGELOG.md` under `## [Unreleased]`.
 - Notable decisions get an ADR in `docs/adr/` (copy `0000-template.md`).
+- Identify yourself by GitHub handle, not a real personal name, in anything that lands in the
+  repo (see [repo-kit#25](https://github.com/PBNZ/repo-kit/issues/25)).
 
 ## Where things live
 

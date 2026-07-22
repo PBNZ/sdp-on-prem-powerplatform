@@ -172,7 +172,7 @@ def build(title, description, base_path, ops, definitions):
             "title": title,
             "description": description,
             "version": "0.3.0",
-            "contact": {"name": "Peter Braun", "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform"},
+            "contact": {"name": "PBNZ", "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform"},
         },
         "host": "sdp.example.com",
         "basePath": base_path,

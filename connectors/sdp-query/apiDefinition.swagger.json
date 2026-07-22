@@ -5,7 +5,7 @@
     "description": "Read-only power tool for ManageEngine ServiceDesk Plus On-Premises: run one SQL SELECT via the Execute Query report API to replace many REST GETs (JOINs, custom fields, aggregates). Auth: technician API key in the 'authtoken' header; the SELECT is wrapped in a single 'input_data' JSON envelope. Admin-scoped ('Create Query Report' permission) and build/edition-gated — probe with 'SELECT 1 AS test' at setup and fall back to REST if it errors. Physical schema names vary by build; keep SQL in the templates/ library. Definition (import-by-URL): https://raw.githubusercontent.com/PBNZ/sdp-on-prem-powerplatform/main/connectors/sdp-query/apiDefinition.swagger.json",
     "version": "0.3.0",
     "contact": {
-      "name": "Peter Braun",
+      "name": "PBNZ",
       "url": "https://github.com/PBNZ/sdp-on-prem-powerplatform"
     }
   },

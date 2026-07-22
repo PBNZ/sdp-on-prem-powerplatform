@@ -30,7 +30,7 @@
   LICENSE, SECURITY / CODE_OF_CONDUCT / contributor-facing CONTRIBUTING, issue+PR templates,
   definition-validation CI, and a history rewrite dropping a truncated demo-key prefix
   (ADR-0002).
-- **Repo is PUBLIC (2026-07-06).** Peter had the visibility flipped + About/topics set; verified:
+- **Repo is PUBLIC (2026-07-06).** The maintainer flipped visibility + set About/topics; verified:
   visibility PUBLIC, Apache-2.0 detected, raw definition URL serves HTTP 200, validate CI green.
 - **Per-action "Learn more" docs (2026-07-07):** every operation (55) now links its own doc
   page (`connectors/<name>/actions/<op>.md`) via operation `externalDocs` **and** a
@@ -43,6 +43,11 @@
   (*PropertyMustBeRequired*) and the runtime would silently drop. Fixed in the generator
   (all three V3 connectors regenerated); `tools/check_pp_rules.py` added to CI so
   swagger-cli's blind spot is covered offline. See LESSONS.md.
+- **Author identity is the GitHub handle (2026-07-22).** `PBNZ` replaces the maintainer's real
+  name everywhere in the **tree** — connector `info.contact.name` in all four definitions, the
+  generator that stamps it, ADR-0001, and prose in this file, LESSONS.md and the WSL2 runbook
+  (repo-kit#25). A CI step fails the build if a real name reappears. **Git history is
+  deliberately not rewritten** — see *Exact next step*.
 
 ## In progress
 
@@ -61,13 +66,19 @@
 ## Exact next step
 
 v1 build complete (Phases 0–3); published as a public personal alpha (ADR-0002). Remaining
-(needs Peter / a tenant):
+(needs the maintainer / a tenant):
 1. Live **write** verification (create/update/close/delete, CI writes, relationship writes) on a
    disposable instance once a valid technician key exists — run
    `tools/live-test.ps1 -HostName <host> -ApiKey <key> -IncludeCreate -SkipCertCheck`.
-2. Optional: import one connector into a real Power Platform tenant (by raw URL — see README) and
+2. **Decide on the git-history name scrub.** The tree is clean of the maintainer's real name, but
+   it remains in every commit — in the tree of all 20 commits (via ADR-0001 and, from `8007b7a`
+   on, the connector contact metadata) and in the body of commit `3ca1999`. Removing it means a
+   `git filter-repo --replace-text` over the whole history plus a force-push, so it is the
+   owner's call, not an automatic follow-on. Precedent: the pre-publication rewrite in ADR-0002.
+   Doing nothing is a valid choice — record it either way.
+3. Optional: import one connector into a real Power Platform tenant (by raw URL — see README) and
    run one action end-to-end.
-3. Optional enhancements: friendly typed params for top actions; dynamic-host policy; Microsoft
+4. Optional enhancements: friendly typed params for top actions; dynamic-host policy; Microsoft
    certification.
 
 ## Phase map (per the PRD — a private planning doc, §6)
