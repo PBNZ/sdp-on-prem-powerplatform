@@ -40,6 +40,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   swagger-cli can't (internal + default ⇒ required, internal + required ⇒ default).
 - `scripts/repokit-check.ps1` — RepoKit's compliance self-check (START-HERE map paths resolve,
   changelog / ADR / resume-state artifacts present), stamped by RepoKit 0.5.0.
+- `docs/api-coverage.md` — what the 55 connector operations cover against the 206 documented
+  on-prem V3 operations, which modules a build actually serves (with the read-only probe that
+  settles it), and the fact that the current scope was never a recorded decision.
 
 ### Changed
 

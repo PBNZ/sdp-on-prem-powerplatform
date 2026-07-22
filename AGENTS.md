@@ -22,6 +22,7 @@ checklists, use the `repo-standard` skill (RepoKit: `/plugin marketplace add PBN
 | Tests / live verification | [`tools/live-test.ps1`](tools/live-test.ps1) — live smoke test against a disposable instance; evidence lands in [`docs/test-evidence/`](docs/test-evidence/) |
 | Execute-Query SQL templates | [`templates/`](templates/) |
 | Test evidence (live request/response captures) | [`docs/test-evidence/`](docs/test-evidence/) |
+| What the connectors cover vs what SDP offers | [`docs/api-coverage.md`](docs/api-coverage.md) |
 | Build state / exact resume point | [`CHECKPOINT.md`](CHECKPOINT.md) — at the repo root, a declared variance from RepoKit's default location under `docs/` |
 | Non-obvious findings (memory file) | [`LESSONS.md`](LESSONS.md) |
 
