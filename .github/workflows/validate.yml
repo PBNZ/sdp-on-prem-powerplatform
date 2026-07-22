@@ -61,6 +61,10 @@ jobs:
           python3 tools/gen_action_docs.py
           git diff --exit-code connectors/
 
+      - name: RepoKit compliance self-check
+        shell: pwsh
+        run: ./scripts/repokit-check.ps1
+
       - name: No real personal name in the tree (repo-kit#25 — author is the handle PBNZ)
         # Patterns are bracketed ([p]eter) so this step never matches its own source.
         run: |

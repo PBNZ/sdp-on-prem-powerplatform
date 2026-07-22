@@ -8,30 +8,37 @@ may take a while, and the project's direction follows the maintainer's own use c
 ## The most useful contributions right now
 
 - **Verification reports.** "Operation X returns Y on SDP build Z" — with the build number and
-  a redacted request/response — is gold, because behaviour varies by build (see `LESSONS.md`).
+  a redacted request/response — is gold, because behaviour varies by build (see
+  [`LESSONS.md`](LESSONS.md)).
 - **Bug reports** against the definitions (wrong path, wrong parameter shape, an operation
   Power Platform rejects on import).
-- **SQL template fixes** for other builds' physical schema names (`templates/`).
+- **SQL template fixes** for other builds' physical schema names ([`templates/`](templates/)).
 
 ## Ground rules for changes
 
 - The three V3 connector definitions are **generated**: edit the operation tables in
-  `tools/gen_swagger.py`, run `python tools/gen_swagger.py`, and commit the regenerated JSON
-  (the committed JSON is the reviewed artifact). Only `sdp-cmdb-v1` is hand-edited directly.
+  [`tools/gen_swagger.py`](tools/gen_swagger.py), run `python tools/gen_swagger.py`, and commit
+  the regenerated JSON (the committed JSON is the reviewed artifact). Only `sdp-cmdb-v1` is
+  hand-edited directly.
+- Bump a definition's `info.version` when anything a consumer binds to changes (an operation,
+  path, parameter, or response). Metadata-only edits — contact, description wording — do not
+  warrant a bump, because a bump asks every existing user to re-import.
 - Definitions must stay **valid Swagger 2.0** and under Power Platform's 1 MB import cap:
   `npx @apidevtools/swagger-cli validate connectors/<name>/apiDefinition.swagger.json`
   (CI runs the same check).
 - **Never commit an API key** — not even a truncated one — and never add write-operation tests
   against ManageEngine's shared public demo. Write-testing happens only on a disposable
-  instance (see `docs/deploy-sdp-wsl2.md`).
-- [Conventional Commits](https://www.conventionalcommits.org/); one concern per PR; add
-  user-visible changes to `CHANGELOG.md` under `## [Unreleased]`.
-- Notable decisions get an ADR in `docs/adr/` (copy `0000-template.md`).
+  instance (see [`docs/deploy-sdp-wsl2.md`](docs/deploy-sdp-wsl2.md)).
+- [Conventional Commits](https://www.conventionalcommits.org/); one concern per PR, referencing
+  its driving issue as `Refs #NN` (no auto-close keywords); add user-visible changes to
+  [`CHANGELOG.md`](CHANGELOG.md) under `## [Unreleased]`.
+- Notable decisions get an ADR in [`docs/adr/`](docs/adr/) (copy
+  [`0000-template.md`](docs/adr/0000-template.md)).
 - Identify yourself by GitHub handle, not a real personal name, in anything that lands in the
   repo (see [repo-kit#25](https://github.com/PBNZ/repo-kit/issues/25)).
 
 ## Where things live
 
 Start with the map in [`AGENTS.md`](AGENTS.md). Short version: connector definitions in
-`connectors/<name>/`, SQL templates in `templates/`, live-capture evidence in
-`docs/test-evidence/`, decisions in `docs/adr/`.
+`connectors/<name>/`, SQL templates in [`templates/`](templates/), live-capture evidence in
+[`docs/test-evidence/`](docs/test-evidence/), decisions in [`docs/adr/`](docs/adr/).

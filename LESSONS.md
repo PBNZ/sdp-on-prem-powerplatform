@@ -24,9 +24,10 @@ offline: internal+default ⇒ required, and internal+required ⇒ default.
 
 The type template stamps a Postman→Swagger generation pipeline. This project hand-authors
 definitions (PRD non-goal: no mechanical conversion), so the pipeline files were omitted at
-scaffold time (ADR-0001). An upstream issue for pbnz/repo-kit is drafted but not yet filed —
-filing to an external repo was blocked by the write-safety classifier in autonomous mode; the
-maintainer can post it (draft text in ADR-0001 / this file's history).
+scaffold time ([ADR-0001](docs/adr/0001-initial-decisions.md)) — a declared variance, carried as a
+row in the [`AGENTS.md`](AGENTS.md) START-HERE map. An upstream issue asking
+[PBNZ/repo-kit](https://github.com/PBNZ/repo-kit) for a hand-authored variant of the type is
+drafted but **still not filed** (draft text in this file's history); nothing blocks filing it now.
 
 ## response_status shape tracks the response kind (list → array, single/error → object), not the build
 

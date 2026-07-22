@@ -2,6 +2,8 @@
 
 > Build state for autonomous runs. Keep current: done / in progress / exact next step.
 
+- Last updated: 2026-07-22
+
 ## Done
 
 - Repo scaffolded (RepoKit Core tier, hand-authored variant — see ADR-0001).
@@ -38,16 +40,26 @@
   `tools/gen_action_docs.py` (parameters mechanically from the swagger, examples curated;
   grammar verified against the official on-prem V3 refs); `tools/check_action_docs.py` + CI
   keep links/docs/parameter coverage in lockstep. ADR-0003. Versions: V3 0.3.0, V1 0.2.0.
+- **Docs-hosting decision (2026-07-22):** the GitHub wiki was evaluated and rejected; action docs
+  stay in-repo ([ADR-0004](docs/adr/0004-action-docs-stay-in-repo.md)). GitHub Pages is the
+  recorded escape hatch, deliberately unbuilt and tracked as issue #2 — deferred until after
+  more live testing.
+- **Author identity is the GitHub handle (2026-07-22).** `PBNZ` replaces the maintainer's real
+  name everywhere in the **tree** — connector `info.contact.name` in all four definitions, the
+  generator that stamps it, ADR-0001, and prose in this file, [`LESSONS.md`](LESSONS.md) and the
+  WSL2 runbook ([repo-kit#25](https://github.com/PBNZ/repo-kit/issues/25)). A CI step fails the
+  build if a real name reappears. **Git history is deliberately not rewritten** — see
+  *Exact next step* item 2.
+- **RepoKit 0.5.0 compliance pass (2026-07-22):** repo was scaffolded against an older RepoKit.
+  Added [`scripts/repokit-check.ps1`](scripts/repokit-check.ps1) and wired it into CI; declared
+  the CI and connector-generation variances in the START-HERE map; adopted the `Refs #NN` PR
+  convention and the 0.5.0 AGENTS.md ground rules; applied the doc-style *Links* rule to the
+  files touched; created the missing `verification` label.
 - **First real portal import (2026-07-06) surfaced + fixed an x-ms blocker:** the internal
   `Accept` header had `required: false`, which the portal wizard rejects at save
   (*PropertyMustBeRequired*) and the runtime would silently drop. Fixed in the generator
   (all three V3 connectors regenerated); `tools/check_pp_rules.py` added to CI so
   swagger-cli's blind spot is covered offline. See LESSONS.md.
-- **Author identity is the GitHub handle (2026-07-22).** `PBNZ` replaces the maintainer's real
-  name everywhere in the **tree** — connector `info.contact.name` in all four definitions, the
-  generator that stamps it, ADR-0001, and prose in this file, LESSONS.md and the WSL2 runbook
-  (repo-kit#25). A CI step fails the build if a real name reappears. **Git history is
-  deliberately not rewritten** — see *Exact next step*.
 
 ## In progress
 
@@ -87,9 +99,3 @@ v1 build complete (Phases 0–3); published as a public personal alpha (ADR-0002
 - [x] Phase 1 — full Service Desk connector + admin lookups (37 ops, reads live, verified 9/9)
 - [x] Phase 2 — Assets & CMDB v3 (13 ops) + CMDB v1 legacy (4 ops), both verifier PASS
 - [x] Phase 3 — Query connector (1 op) + 8 live-verified SQL templates
-
-## Cross-phase open item
-
-- **Live write (2xx) verification** for POST/PUT/DELETE ops across all connectors is still
-  pending a valid technician API key on a disposable instance (see LESSONS.md). Reads are fully
-  verified live. Write ops are authored + structurally verified.

@@ -38,6 +38,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `tools/check_pp_rules.py` + CI step — enforces the Power Platform x-ms rules that
   swagger-cli can't (internal + default ⇒ required, internal + required ⇒ default).
+- `scripts/repokit-check.ps1` — RepoKit's compliance self-check (START-HERE map paths resolve,
+  changelog / ADR / resume-state artifacts present), stamped by RepoKit 0.5.0.
 
 ### Changed
 

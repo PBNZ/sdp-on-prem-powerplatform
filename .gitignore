@@ -4,6 +4,7 @@ Thumbs.db
 *.swp
 .idea/
 .vscode/
+.claude/
 
 # Python bytecode (tools/ scripts import each other)
 __pycache__/
